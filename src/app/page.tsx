@@ -114,18 +114,11 @@ export default function Home() {
                   <div className="w-1/3 pr-3 border-r">
                     <h2 className="text-lg font-semibold mb-1">{seeker.full_name}</h2>
                     <p className="text-sm text-gray-600 mb-2">{seeker.country}</p>
-                    <div className="flex flex-wrap gap-1">
-                      {seeker.skills.slice(0, 2).map((skill, index) => (
-                        <span key={index} className="bg-gray-100 px-2 py-0.5 rounded-full text-xs">
-                          {skill}
-                        </span>
-                      ))}
-                    </div>
                   </div>
                   <div className="w-2/3 pl-3">
                     <p className="text-sm text-gray-700 line-clamp-2 mb-2">{seeker.bio}</p>
                     <div className="flex flex-wrap gap-1">
-                      {seeker.skills.slice(2).map((skill, index) => (
+                      {seeker.skills.map((skill, index) => (
                         <span key={index} className="bg-gray-100 px-2 py-0.5 rounded-full text-xs">
                           {skill}
                         </span>
