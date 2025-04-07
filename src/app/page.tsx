@@ -15,7 +15,7 @@ interface JobSeeker {
   bio: string;
 }
 
-const ITEMS_PER_PAGE = 16;
+const ITEMS_PER_PAGE = 14;
 
 export default function Home() {
   const [jobSeekers, setJobSeekers] = useState<JobSeeker[]>([]);
@@ -126,11 +126,12 @@ export default function Home() {
                         }}
                       >
                         <div className="flex h-full">
-                          <div className="w-1/3 pr-3 border-r">
+                          <div className="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center text-lg font-bold text-gray-600 mr-3 flex-shrink-0">
+                            {seeker.full_name.charAt(0)}
+                          </div>
+                          <div className="flex-1">
                             <h2 className="text-lg font-semibold mb-1">{seeker.full_name}</h2>
                             <p className="text-sm text-gray-600 mb-2">{seeker.country}</p>
-                          </div>
-                          <div className="w-2/3 pl-3">
                             <p className="text-sm text-gray-700 line-clamp-2 mb-2">{seeker.bio}</p>
                             <div className="flex flex-wrap gap-1">
                               {seeker.skills.map((skill, index) => (
@@ -146,9 +147,9 @@ export default function Home() {
                   </div>
                 </div>
               )}
-              <div className={`${isFullScreen ? 'w-full' : 'w-1/2'} border rounded-lg p-6 overflow-y-auto`}>
-                <div className="flex justify-between items-center mb-6">
-                  <div className="flex gap-2">
+              <div className={`${isFullScreen ? 'w-full' : 'w-1/2'} border rounded-lg p-8 overflow-y-auto bg-white shadow-xl`}>
+                <div className="flex justify-between items-center mb-8 pb-6 border-b">
+                  <div className="flex gap-3">
                     <Button 
                       variant="outline" 
                       size="sm"
@@ -156,53 +157,100 @@ export default function Home() {
                         setSelectedSeeker(null);
                         setIsFullScreen(false);
                       }}
-                      className="flex items-center gap-1"
+                      className="flex items-center gap-2 hover:bg-gray-100 transition-colors"
                     >
                       <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                         <line x1="18" y1="6" x2="6" y2="18"></line>
                         <line x1="6" y1="6" x2="18" y2="18"></line>
                       </svg>
-                      Close
+                      Back to List
                     </Button>
                     {!isFullScreen && (
                       <Button 
                         variant="outline" 
                         size="sm"
                         onClick={() => setIsFullScreen(true)}
-                        className="flex items-center gap-1"
+                        className="flex items-center gap-2 hover:bg-gray-100 transition-colors"
                       >
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                           <path d="M3 3h3a2 2 0 0 1 2 2v3m0 0h3a2 2 0 0 1 2 2v3m0 0h3a2 2 0 0 1 2 2v3"></path>
                         </svg>
-                        Maximize
+                        Full Screen
                       </Button>
                     )}
                   </div>
                 </div>
-                <div className="space-y-4">
-                  <h2 className="text-2xl font-bold">{selectedSeeker.full_name}</h2>
-                  <div className="text-gray-600">{selectedSeeker.country}</div>
-                  <div className="space-y-2">
-                    <h3 className="text-lg font-semibold">Bio</h3>
-                    <p className="text-gray-700">{selectedSeeker.bio}</p>
-                  </div>
-                  <div className="space-y-2">
-                    <h3 className="text-lg font-semibold">Skills</h3>
-                    <div className="flex flex-wrap gap-2">
-                      {selectedSeeker.skills.map((skill, index) => (
-                        <span key={index} className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full">
-                          {skill}
-                        </span>
-                      ))}
+                <div className="space-y-8">
+                  <div className="flex items-center gap-6">
+                    <div className="w-24 h-24 rounded-full bg-gradient-to-br from-blue-500 to-blue-300 flex items-center justify-center text-4xl font-bold text-white shadow-lg">
+                      {selectedSeeker.full_name.charAt(0)}
+                    </div>
+                    <div>
+                      <h2 className="text-3xl font-bold text-gray-900 mb-2">{selectedSeeker.full_name}</h2>
+                      <div className="flex items-center gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                          <circle cx="12" cy="10" r="3"></circle>
+                        </svg>
+                        <p className="text-gray-600 text-lg">{selectedSeeker.country}</p>
+                      </div>
                     </div>
                   </div>
-                  <div className="space-y-2">
-                    <h3 className="text-lg font-semibold">Experience</h3>
-                    <p className="text-gray-700">{selectedSeeker.experience}</p>
+
+                  <div className="bg-gray-50 rounded-xl p-6">
+                    <h3 className="text-xl font-semibold text-gray-900 mb-4">Professional Summary</h3>
+                    <p className="text-gray-700 leading-relaxed">{selectedSeeker.bio}</p>
                   </div>
-                  <div className="space-y-2">
-                    <h3 className="text-lg font-semibold">Education</h3>
-                    <p className="text-gray-700">{selectedSeeker.education}</p>
+
+                  <div className="space-y-6">
+                    <div className="space-y-4">
+                      <h3 className="text-xl font-semibold text-gray-900">Skills & Expertise</h3>
+                      <div className="flex flex-wrap gap-2">
+                        {selectedSeeker.skills.map((skill, index) => (
+                          <span key={index} className="bg-blue-100 text-blue-800 px-4 py-2 rounded-full text-sm font-medium">
+                            {skill}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div className="space-y-4">
+                      <h3 className="text-xl font-semibold text-gray-900">Work Experience</h3>
+                      <div className="relative pl-8">
+                        <div className="absolute left-0 top-0 bottom-0 w-0.5 bg-gradient-to-b from-blue-500 to-blue-300"></div>
+                        {selectedSeeker.experience.split('\n').map((exp, index) => {
+                          const [date, ...details] = exp.split(' - ');
+                          return (
+                            <div key={index} className="relative mb-6 last:mb-0">
+                              <div className="absolute left-0 -translate-x-1/2 w-3 h-3 rounded-full bg-blue-500"></div>
+                              <div className="ml-4">
+                                <div className="text-sm font-medium text-blue-600">{date}</div>
+                                <div className="mt-1 text-gray-700 leading-relaxed">{details.join(' - ')}</div>
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+
+                    <div className="space-y-4">
+                      <h3 className="text-xl font-semibold text-gray-900">Education</h3>
+                      <div className="relative pl-8">
+                        <div className="absolute left-0 top-0 bottom-0 w-0.5 bg-gradient-to-b from-green-500 to-green-300"></div>
+                        {selectedSeeker.education.split('\n').map((edu, index) => {
+                          const [date, ...details] = edu.split(' - ');
+                          return (
+                            <div key={index} className="relative mb-6 last:mb-0">
+                              <div className="absolute left-0 -translate-x-1/2 w-3 h-3 rounded-full bg-green-500"></div>
+                              <div className="ml-4">
+                                <div className="text-sm font-medium text-green-600">{date}</div>
+                                <div className="mt-1 text-gray-700 leading-relaxed">{details.join(' - ')}</div>
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -216,11 +264,12 @@ export default function Home() {
                   onClick={() => setSelectedSeeker(seeker)}
                 >
                   <div className="flex h-full">
-                    <div className="w-1/3 pr-3 border-r">
+                    <div className="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center text-lg font-bold text-gray-600 mr-3 flex-shrink-0">
+                      {seeker.full_name.charAt(0)}
+                    </div>
+                    <div className="flex-1">
                       <h2 className="text-lg font-semibold mb-1">{seeker.full_name}</h2>
                       <p className="text-sm text-gray-600 mb-2">{seeker.country}</p>
-                    </div>
-                    <div className="w-2/3 pl-3">
                       <p className="text-sm text-gray-700 line-clamp-2 mb-2">{seeker.bio}</p>
                       <div className="flex flex-wrap gap-1">
                         {seeker.skills.map((skill, index) => (
