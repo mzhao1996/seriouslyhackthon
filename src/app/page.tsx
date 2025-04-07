@@ -130,24 +130,29 @@ export default function Home() {
             ))}
           </div>
         </div>
-        <div className="flex-none flex justify-center gap-4 mt-4">
-          <Button
-            onClick={handlePrevPage}
-            disabled={currentPage === 1}
-            className="px-4 py-1"
-          >
-            Previous
-          </Button>
-          <span className="flex items-center">
-            Page {currentPage} of {totalPages}
-          </span>
-          <Button
-            onClick={handleNextPage}
-            disabled={currentPage === totalPages}
-            className="px-4 py-1"
-          >
-            Next
-          </Button>
+        <div className="flex-none flex items-center justify-center gap-8 mt-4">
+          <div className="text-sm text-gray-600 bg-gray-50 px-4 py-2 rounded-lg shadow-sm">
+            Showing <span className="font-medium">{startIndex + 1}-{Math.min(endIndex, filteredJobSeekers.length)}</span> of <span className="font-medium">{filteredJobSeekers.length}</span> job seekers
+          </div>
+          <div className="flex items-center gap-4">
+            <Button
+              onClick={handlePrevPage}
+              disabled={currentPage === 1}
+              className="px-4 py-1 bg-gray-100 hover:bg-gray-200 text-gray-800"
+            >
+              Previous
+            </Button>
+            <span className="text-sm text-gray-600">
+              Page {currentPage} of {totalPages}
+            </span>
+            <Button
+              onClick={handleNextPage}
+              disabled={currentPage === totalPages}
+              className="px-4 py-1 bg-gray-100 hover:bg-gray-200 text-gray-800"
+            >
+              Next
+            </Button>
+          </div>
         </div>
       </main>
     </div>
