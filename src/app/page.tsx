@@ -35,7 +35,11 @@ export default function Home() {
     fetchJobSeekers();
   }, []);
 
-  useEffect(() => {
+  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(e.target.value);
+  };
+
+  const performSearch = () => {
     if (searchQuery.trim() === "") {
       setFilteredJobSeekers(jobSeekers);
     } else {
@@ -48,7 +52,13 @@ export default function Home() {
       setFilteredJobSeekers(filtered);
     }
     setCurrentPage(1);
-  }, [searchQuery, jobSeekers]);
+  };
+
+  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      performSearch();
+    }
+  };
 
   const fetchJobSeekers = async () => {
     try {
@@ -64,10 +74,6 @@ export default function Home() {
     } finally {
       setLoading(false);
     }
-  };
-
-  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchQuery(e.target.value);
   };
 
   const totalPages = Math.ceil(filteredJobSeekers.length / ITEMS_PER_PAGE);
@@ -100,13 +106,19 @@ export default function Home() {
       <main className="h-full flex flex-col">
         <div className="flex-none mb-4">
           <h1 className="text-3xl font-bold mb-4">Job Seekers</h1>
-          <Input
-            type="text"
-            placeholder="Search by name, country, skills or bio..."
-            value={searchQuery}
-            onChange={handleSearch}
-            className="w-full h-10 text-base"
-          />
+          <div className="flex gap-2">
+            <Input
+              type="text"
+              placeholder="Search by name, country, skills or bio..."
+              value={searchQuery}
+              onChange={handleSearch}
+              onKeyPress={handleKeyPress}
+              className="w-full h-10 text-base"
+            />
+            <Button onClick={performSearch} className="h-10">
+              Search
+            </Button>
+          </div>
         </div>
         <div className="flex-1 overflow-hidden">
           {selectedSeeker ? (
