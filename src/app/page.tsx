@@ -4,6 +4,29 @@ import { useEffect, useState } from "react";
 import { createClient } from '@supabase/supabase-js';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+} from "@/components/ui/command";
+import { Badge } from "@/components/ui/badge";
+import { X } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface JobSeeker {
   id: number;
@@ -17,6 +40,13 @@ interface JobSeeker {
 
 const ITEMS_PER_PAGE = 14;
 
+const EXPERIENCE_LEVELS = [
+  "Entry Level (0-2 years)",
+  "Mid Level (3-5 years)",
+  "Senior Level (6-10 years)",
+  "Expert Level (10+ years)"
+];
+
 export default function Home() {
   const [jobSeekers, setJobSeekers] = useState<JobSeeker[]>([]);
   const [filteredJobSeekers, setFilteredJobSeekers] = useState<JobSeeker[]>([]);
@@ -25,6 +55,19 @@ export default function Home() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedSeeker, setSelectedSeeker] = useState<JobSeeker | null>(null);
   const [isFullScreen, setIsFullScreen] = useState(false);
+  const [selectedCountries, setSelectedCountries] = useState<string[]>([]);
+  const [selectedSkills, setSelectedSkills] = useState<string[]>([]);
+  const [selectedExperience, setSelectedExperience] = useState<string[]>([]);
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const [countrySearch, setCountrySearch] = useState("");
+  const [skillSearch, setSkillSearch] = useState("");
+  const [experienceSearch, setExperienceSearch] = useState("");
+  const [countrySelectValue, setCountrySelectValue] = useState("");
+  const [skillSelectValue, setSkillSelectValue] = useState("");
+  const [experienceSelectValue, setExperienceSelectValue] = useState("");
+  const [isCountryCommandOpen, setIsCountryCommandOpen] = useState(false);
+  const [isSkillCommandOpen, setIsSkillCommandOpen] = useState(false);
+  const [isExperienceCommandOpen, setIsExperienceCommandOpen] = useState(false);
 
   const supabase = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -33,6 +76,20 @@ export default function Home() {
 
   useEffect(() => {
     fetchJobSeekers();
+  }, []);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as HTMLElement;
+      if (!target.closest('.command-container')) {
+        setIsCountryCommandOpen(false);
+        setIsSkillCommandOpen(false);
+        setIsExperienceCommandOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -51,6 +108,66 @@ export default function Home() {
       );
       setFilteredJobSeekers(filtered);
     }
+    setCurrentPage(1);
+  };
+
+  const uniqueCountries = Array.from(new Set(jobSeekers.map(seeker => seeker.country)));
+  const uniqueSkills = Array.from(new Set(jobSeekers.flatMap(seeker => seeker.skills)));
+  const uniqueExperience = Array.from(new Set(jobSeekers.map(seeker => seeker.experience)));
+
+  const filteredCountries = uniqueCountries.filter(country => 
+    country.toLowerCase().includes(countrySearch.toLowerCase())
+  );
+  const filteredSkills = uniqueSkills.filter(skill => 
+    skill.toLowerCase().includes(skillSearch.toLowerCase())
+  );
+  const filteredExperience = EXPERIENCE_LEVELS.filter(level => 
+    level.toLowerCase().includes(experienceSearch.toLowerCase())
+  );
+
+  const handleCountrySelect = (value: string) => {
+    setCountrySelectValue(value);
+    if (value && !selectedCountries.includes(value)) {
+      setSelectedCountries([...selectedCountries, value]);
+    }
+  };
+
+  const handleSkillSelect = (value: string) => {
+    setSkillSelectValue(value);
+    if (value && !selectedSkills.includes(value)) {
+      setSelectedSkills([...selectedSkills, value]);
+    }
+  };
+
+  const handleExperienceSelect = (value: string) => {
+    setExperienceSelectValue(value);
+    if (value && !selectedExperience.includes(value)) {
+      setSelectedExperience([...selectedExperience, value]);
+    }
+  };
+
+  const applyFilters = () => {
+    let filtered = jobSeekers;
+
+    if (selectedCountries.length > 0) {
+      filtered = filtered.filter(seeker => 
+        selectedCountries.includes(seeker.country)
+      );
+    }
+
+    if (selectedSkills.length > 0) {
+      filtered = filtered.filter(seeker => 
+        selectedSkills.some(skill => seeker.skills.includes(skill))
+      );
+    }
+
+    if (selectedExperience.length > 0) {
+      filtered = filtered.filter(seeker => 
+        selectedExperience.some(exp => seeker.experience.includes(exp))
+      );
+    }
+
+    setFilteredJobSeekers(filtered);
     setCurrentPage(1);
   };
 
@@ -118,6 +235,228 @@ export default function Home() {
             <Button onClick={performSearch} className="h-10">
               Search
             </Button>
+            <Dialog open={isFilterOpen} onOpenChange={setIsFilterOpen}>
+              <DialogTrigger asChild>
+                <Button variant="outline" className="h-10">
+                  Filters
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-[600px] h-[600px] overflow-hidden flex flex-col">
+                <DialogHeader>
+                  <DialogTitle>Advanced Filters</DialogTitle>
+                </DialogHeader>
+                <div className="flex-1 overflow-y-auto space-y-6 py-4">
+                  <div className="space-y-2">
+                    <div className="flex justify-between items-center">
+                      <h4 className="font-medium">Countries</h4>
+                      <Button 
+                        variant="ghost" 
+                        size="sm"
+                        onClick={() => setSelectedCountries([])}
+                        className="h-8 px-2 text-xs"
+                      >
+                        Reset
+                      </Button>
+                    </div>
+                    <div className="flex flex-wrap gap-2 mb-2">
+                      {selectedCountries.map((country) => (
+                        <Badge key={country} variant="secondary">
+                          {country}
+                          <button
+                            onClick={() => setSelectedCountries(prev => prev.filter(c => c !== country))}
+                            className="ml-1 hover:text-red-500"
+                          >
+                            <X className="h-3 w-3" />
+                          </button>
+                        </Badge>
+                      ))}
+                    </div>
+                    <div className="command-container relative">
+                      <Command 
+                        className="rounded-lg border shadow-md"
+                        shouldFilter={false}
+                      >
+                        <CommandInput 
+                          placeholder="Search countries..." 
+                          value={countrySearch}
+                          onValueChange={setCountrySearch}
+                          onFocus={() => setIsCountryCommandOpen(true)}
+                        />
+                        {isCountryCommandOpen && (
+                          <div className="absolute top-full left-0 right-0 z-50 bg-white border rounded-md shadow-lg mt-1">
+                            <CommandGroup className="max-h-[200px] overflow-auto">
+                              {filteredCountries.length > 0 ? (
+                                filteredCountries.map((country) => (
+                                  <CommandItem
+                                    key={country}
+                                    value={country}
+                                    onSelect={() => {
+                                      if (!selectedCountries.includes(country)) {
+                                        setSelectedCountries([...selectedCountries, country]);
+                                      }
+                                      setIsCountryCommandOpen(false);
+                                      setCountrySearch("");
+                                    }}
+                                    disabled={selectedCountries.includes(country)}
+                                  >
+                                    {country}
+                                  </CommandItem>
+                                ))
+                              ) : (
+                                <div className="py-2 text-center text-sm text-muted-foreground">
+                                  No matching countries found
+                                </div>
+                              )}
+                            </CommandGroup>
+                          </div>
+                        )}
+                      </Command>
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <div className="flex justify-between items-center">
+                      <h4 className="font-medium">Skills</h4>
+                      <Button 
+                        variant="ghost" 
+                        size="sm"
+                        onClick={() => setSelectedSkills([])}
+                        className="h-8 px-2 text-xs"
+                      >
+                        Reset
+                      </Button>
+                    </div>
+                    <div className="flex flex-wrap gap-2 mb-2">
+                      {selectedSkills.map((skill) => (
+                        <Badge key={skill} variant="secondary">
+                          {skill}
+                          <button
+                            onClick={() => setSelectedSkills(prev => prev.filter(s => s !== skill))}
+                            className="ml-1 hover:text-red-500"
+                          >
+                            <X className="h-3 w-3" />
+                          </button>
+                        </Badge>
+                      ))}
+                    </div>
+                    <div className="command-container relative">
+                      <Command 
+                        className="rounded-lg border shadow-md"
+                        shouldFilter={false}
+                      >
+                        <CommandInput 
+                          placeholder="Search skills..." 
+                          value={skillSearch}
+                          onValueChange={setSkillSearch}
+                          onFocus={() => setIsSkillCommandOpen(true)}
+                        />
+                        {isSkillCommandOpen && (
+                          <div className="absolute top-full left-0 right-0 z-50 bg-white border rounded-md shadow-lg mt-1">
+                            <CommandGroup className="max-h-[200px] overflow-auto">
+                              {filteredSkills.length > 0 ? (
+                                filteredSkills.map((skill) => (
+                                  <CommandItem
+                                    key={skill}
+                                    value={skill}
+                                    onSelect={() => {
+                                      if (!selectedSkills.includes(skill)) {
+                                        setSelectedSkills([...selectedSkills, skill]);
+                                      }
+                                      setIsSkillCommandOpen(false);
+                                      setSkillSearch("");
+                                    }}
+                                    disabled={selectedSkills.includes(skill)}
+                                  >
+                                    {skill}
+                                  </CommandItem>
+                                ))
+                              ) : (
+                                <div className="py-2 text-center text-sm text-muted-foreground">
+                                  No matching skills found
+                                </div>
+                              )}
+                            </CommandGroup>
+                          </div>
+                        )}
+                      </Command>
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <div className="flex justify-between items-center">
+                      <h4 className="font-medium">Experience</h4>
+                      <Button 
+                        variant="ghost" 
+                        size="sm"
+                        onClick={() => setSelectedExperience([])}
+                        className="h-8 px-2 text-xs"
+                      >
+                        Reset
+                      </Button>
+                    </div>
+                    <div className="flex flex-wrap gap-2 mb-2">
+                      {selectedExperience.map((exp) => (
+                        <Badge key={exp} variant="secondary">
+                          {exp}
+                          <button
+                            onClick={() => setSelectedExperience(prev => prev.filter(e => e !== exp))}
+                            className="ml-1 hover:text-red-500"
+                          >
+                            <X className="h-3 w-3" />
+                          </button>
+                        </Badge>
+                      ))}
+                    </div>
+                    <div className="command-container relative">
+                      <Command 
+                        className="rounded-lg border shadow-md"
+                        shouldFilter={false}
+                      >
+                        <CommandInput 
+                          placeholder="Search experience levels..." 
+                          value={experienceSearch}
+                          onValueChange={setExperienceSearch}
+                          onFocus={() => setIsExperienceCommandOpen(true)}
+                        />
+                        {isExperienceCommandOpen && (
+                          <div className="absolute top-full left-0 right-0 z-50 bg-white border rounded-md shadow-lg mt-1">
+                            <CommandGroup className="max-h-[200px] overflow-auto">
+                              {filteredExperience.length > 0 ? (
+                                filteredExperience.map((level) => (
+                                  <CommandItem
+                                    key={level}
+                                    value={level}
+                                    onSelect={() => {
+                                      if (!selectedExperience.includes(level)) {
+                                        setSelectedExperience([...selectedExperience, level]);
+                                      }
+                                      setIsExperienceCommandOpen(false);
+                                      setExperienceSearch("");
+                                    }}
+                                    disabled={selectedExperience.includes(level)}
+                                  >
+                                    {level}
+                                  </CommandItem>
+                                ))
+                              ) : (
+                                <div className="py-2 text-center text-sm text-muted-foreground">
+                                  No matching experience levels found
+                                </div>
+                              )}
+                            </CommandGroup>
+                          </div>
+                        )}
+                      </Command>
+                    </div>
+                  </div>
+                </div>
+                <div className="flex-none flex justify-end gap-2 pt-4 border-t">
+                  <Button onClick={applyFilters}>
+                    Apply Filters
+                  </Button>
+                </div>
+              </DialogContent>
+            </Dialog>
           </div>
         </div>
         <div className="flex-1 overflow-hidden">
