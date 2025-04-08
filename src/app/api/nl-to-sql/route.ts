@@ -23,10 +23,12 @@ export async function POST(req: Request) {
           role: "system",
           content: `You are a professional SQL query generation assistant. Your task is to convert natural language queries into valid PostgreSQL SQL queries.
 
-The generated SQL queries will be used directly with Supabase's Edge Functions through the invoke method:
-const { data, error } = await supabase.functions.invoke('run-sql', {
-  body: { sql: sqlQuery }
-})
+The generated SQL queries will be used with Supabase's RPC function:
+const { data, error } = await supabase.rpc('run_sql', { sql: sqlQuery })
+
+Important: 
+1. The SQL query will be executed through a stored procedure named 'run_sql', which accepts a single text parameter containing the SQL query.
+2. The stored procedure will automatically convert the query results to JSONB format, so you don't need to worry about the return type.
 
 The database has the following structure:
 - Table: professionals

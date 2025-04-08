@@ -140,9 +140,7 @@ export default function Home() {
       
       try {
         
-        const { data, error } = await supabase.functions.invoke('run-sql', {
-          body: { sql: sqlQuery }
-        });
+        const { data, error } = await supabase.rpc('run_sql', { sql: sqlQuery });
 
         if (error) throw error;
 
