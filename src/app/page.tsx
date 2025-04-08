@@ -13,7 +13,9 @@ import {
 } from "@/components/ui/dialog";
 import {
   Command,
+  CommandGroup,
   CommandInput,
+  CommandItem,
 } from "@/components/ui/command";
 import { Badge } from "@/components/ui/badge";
 import { X } from "lucide-react";
@@ -53,6 +55,18 @@ interface Professional {
 
 const ITEMS_PER_PAGE = 14;
 
+const EXPERIENCE_LEVELS = [
+  "Entry Level (0-2 years)",
+  "Mid Level (3-5 years)",
+  "Senior Level (6-10 years)",
+  "Expert Level (10+ years)"
+];
+
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+);
+
 export default function Home() {
   const [filteredProfessionals, setFilteredProfessionals] = useState<Professional[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
@@ -70,11 +84,6 @@ export default function Home() {
   const [isCountryCommandOpen, setIsCountryCommandOpen] = useState(false);
   const [isSkillCommandOpen, setIsSkillCommandOpen] = useState(false);
   const [isExperienceCommandOpen, setIsExperienceCommandOpen] = useState(false);
-
-  const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-  );
 
   //disply 42 talents, 42 is the answer of the life universe and everything. also each page has 14 talents,42 means 3 pages
   const fetchProfessionals = useCallback(async () => {
@@ -97,7 +106,7 @@ export default function Home() {
     } finally {
       setLoading(false);
     }
-  }, [supabase]);
+  }, []);
 
   useEffect(() => {
     fetchProfessionals();
