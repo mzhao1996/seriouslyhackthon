@@ -1,0 +1,61 @@
+id,full_name,country,skills,experience,education,bio
+12,David Lee,South Korea,"{
+  ""skills"": {
+    ""technical"": {
+      ""Python"": 5,
+      ""TensorFlow"": 4,
+      ""PyTorch"": 3,
+      ""Computer Vision"": 4
+    },
+    ""soft"": {
+      ""Team Leadership"": 3,
+      ""Problem Solving"": 5,
+      ""Communication"": 5
+    },
+    ""certifications"": [""AWS Certified Machine Learning"", ""Google Cloud Professional Data Engineer""]
+  },
+  ""contact"": {
+    ""email"": ""david.lee@example.com"",
+    ""phone"": ""+82-10-1234-5678""
+  },
+  ""experience"": [
+    {
+      ""company"": ""Samsung Electronics"",
+      ""position"": ""Senior AI Researcher"",
+      ""period"": ""2020-Present"",
+      ""responsibilities"": [
+        ""Leading AI research team in computer vision projects"",
+        ""Developing deep learning models for image recognition"",
+        ""Mentoring junior researchers""
+      ],
+      ""achievements"": [
+        ""Published 3 papers in top-tier conferences"",
+        ""Reduced model inference time by 40%""
+      ]
+    },
+    {
+      ""company"": ""LG Electronics"",
+      ""position"": ""AI Engineer"",
+      ""period"": ""2017-2020"",
+      ""responsibilities"": [
+        ""Implemented machine learning algorithms for smart home devices"",
+        ""Optimized neural network architectures""
+      ]
+    }
+  ],
+  ""education"": [
+    {
+      ""institution"": ""KAIST"",
+      ""degree"": ""Ph.D. in Artificial Intelligence"",
+      ""period"": ""2013-2017"",
+      ""thesis"": ""Advanced Neural Network Architectures for Real-time Image Processing"",
+      ""gpa"": ""3.9/4.0""
+    },
+    {
+      ""institution"": ""Seoul National University"",
+      ""degree"": ""M.S. in Computer Science"",
+      ""period"": ""2011-2013"",
+      ""gpa"": ""3.8/4.0""
+    }
+  ]
+}",AI researcher with expertise in computer vision and deep learning. Passionate about developing innovative AI solutions for real-world applications. 

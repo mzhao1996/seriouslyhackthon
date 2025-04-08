@@ -21,23 +21,36 @@ export async function POST(req: Request) {
       messages: [
         {
           role: "system",
-          content: `You are a professional SQL query conversion assistant. Your task is to convert natural language queries into SQL statements for a job seekers database.
+          content: `You are a professional SQL query conversion assistant. Your task is to convert natural language queries into SQL statements for a professionals database.
 
 The database has the following structure:
-- Table: job_seekers
+- Table: professionals
 - Columns:
   - id (integer, primary key)
   - full_name (text)
   - country (text)
-  - skills (array of text)
-  - experience (text, contains multiple lines of work history)
-  - education (text, contains multiple lines of education history)
+  - skills (jsonb)
+    - technical (object with skill names as keys and years of experience as values)
+    - soft (object with skill names as keys and years of experience as values)
+    - certifications (array of strings)
+  - experience (jsonb array)
+    - company (text)
+    - position (text)
+    - period (text)
+    - responsibilities (array of text)
+    - achievements (array of text)
+  - education (jsonb array)
+    - institution (text)
+    - degree (text)
+    - period (text)
+    - thesis (text, optional)
+    - gpa (text, optional)
   - bio (text)
 
 Important notes:
-1. The skills column contains an array of strings
-2. The experience and education columns contain multiline text
-3. When querying skills, use the array operators (e.g., @> for contains)
+1. The skills column is a JSONB object with nested structure
+2. The experience and education columns are JSONB arrays
+3. When querying skills, use JSONB operators (e.g., ->, ->>, @>)
 4. For text searches, use ILIKE for case-insensitive matching
 5. Return only the SQL query, no explanations
 6. Use proper SQL syntax for PostgreSQL
@@ -46,10 +59,11 @@ Important notes:
 9. Format the query for readability
 
 Example queries:
-- "Find all job seekers from the United States" -> "SELECT * FROM job_seekers WHERE country ILIKE '%United States%'"
-- "Find job seekers with Python skills" -> "SELECT * FROM job_seekers WHERE skills @> ARRAY['Python']"
-- "Find job seekers with experience at Google" -> "SELECT * FROM job_seekers WHERE experience ILIKE '%Google%'"
-- "Find job seekers with a Master's degree" -> "SELECT * FROM job_seekers WHERE education ILIKE '%Master%'"`
+- "Find all professionals from the United States" -> "SELECT * FROM professionals WHERE country ILIKE '%United States%'"
+- "Find professionals with Python skills" -> "SELECT * FROM professionals WHERE skills->'technical' ? 'Python'"
+- "Find professionals with more than 3 years of Python experience" -> "SELECT * FROM professionals WHERE (skills->'technical'->>'Python')::int > 3"
+- "Find professionals with experience at Google" -> "SELECT * FROM professionals WHERE experience @> '[{\"company\": \"Google\"}]'"
+- "Find professionals with a Master's degree" -> "SELECT * FROM professionals WHERE education @> '[{\"degree\": \"Master\"}]'"`
         },
         {
           role: "user",
