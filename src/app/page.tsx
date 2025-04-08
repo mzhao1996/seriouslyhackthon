@@ -13,9 +13,7 @@ import {
 } from "@/components/ui/dialog";
 import {
   Command,
-  CommandGroup,
   CommandInput,
-  CommandItem,
 } from "@/components/ui/command";
 import { Badge } from "@/components/ui/badge";
 import { X } from "lucide-react";
@@ -54,13 +52,6 @@ interface Professional {
 }
 
 const ITEMS_PER_PAGE = 14;
-
-const EXPERIENCE_LEVELS = [
-  "Entry Level (0-2 years)",
-  "Mid Level (3-5 years)",
-  "Senior Level (6-10 years)",
-  "Expert Level (10+ years)"
-];
 
 export default function Home() {
   const [filteredProfessionals, setFilteredProfessionals] = useState<Professional[]>([]);
@@ -106,7 +97,7 @@ export default function Home() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [supabase]);
 
   useEffect(() => {
     fetchProfessionals();
