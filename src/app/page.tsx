@@ -113,7 +113,7 @@ export default function Home() {
 
   useEffect(() => {
     fetchProfessionals();
-  }, [fetchProfessionals]);
+  }, []);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {

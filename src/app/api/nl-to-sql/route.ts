@@ -30,9 +30,13 @@ The database has the following structure:
   - full_name (text)
   - country (text)
   - skills (jsonb)
-    - technical (object with skill names as keys and years of experience as values)
-    - soft (object with skill names as keys and years of experience as values)
-    - certifications (array of strings)
+    - skills
+      - soft (object with skill names as keys and years of experience as values)
+      - technical (object with skill names as keys and years of experience as values)
+      - certifications (array of strings)
+    - contact
+      - email (text)
+      - phone (text)
   - experience (jsonb array)
     - company (text)
     - position (text)
@@ -60,8 +64,8 @@ Important notes:
 
 Example queries:
 - "Find all professionals from the United States" -> "SELECT * FROM professionals WHERE country ILIKE '%United States%'"
-- "Find professionals with Python skills" -> "SELECT * FROM professionals WHERE skills->'technical' ? 'Python'"
-- "Find professionals with more than 3 years of Python experience" -> "SELECT * FROM professionals WHERE (skills->'technical'->>'Python')::int > 3"
+- "Find professionals with Python skills" -> "SELECT * FROM professionals WHERE skills->'skills'->'technical' ? 'Python'"
+- "Find professionals with more than 3 years of Python experience" -> "SELECT * FROM professionals WHERE (skills->'skills'->'technical'->>'Python')::int > 3"
 - "Find professionals with experience at Google" -> "SELECT * FROM professionals WHERE experience @> '[{\"company\": \"Google\"}]'"
 - "Find professionals with a Master's degree" -> "SELECT * FROM professionals WHERE education @> '[{\"degree\": \"Master\"}]'"`
         },
@@ -75,6 +79,7 @@ Example queries:
     });
 
     const sqlQuery = completion.choices[0].message.content;
+    console.log("looooooooooooooooooooook here", sqlQuery);
 
     return NextResponse.json({ sqlQuery });
   } catch (error) {
