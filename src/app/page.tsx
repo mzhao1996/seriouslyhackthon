@@ -63,7 +63,6 @@ const EXPERIENCE_LEVELS = [
 ];
 
 export default function Home() {
-  const [professionals, setProfessionals] = useState<Professional[]>([]);
   const [filteredProfessionals, setFilteredProfessionals] = useState<Professional[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [loading, setLoading] = useState(true);
@@ -86,21 +85,21 @@ export default function Home() {
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
   );
 
+  //disply 42 talents, 42 is the answer of the life universe and everything. also each page has 14 talents,42 means 3 pages
   const fetchProfessionals = useCallback(async () => {
     try {
       const { data, error } = await supabase
         .from('professionals')
-        .select('*');
+        .select('*')
+        .limit(42);
       if (error) throw error;
       
-      const formattedData = data?.map(professional => ({
+      const formattedData = data?.map((professional: Professional) => ({
         ...professional,
         skills: typeof professional.skills === 'string' ? JSON.parse(professional.skills) : professional.skills,
         experience: typeof professional.experience === 'string' ? JSON.parse(professional.experience) : professional.experience,
         education: typeof professional.education === 'string' ? JSON.parse(professional.education) : professional.education
       })) || [];
-
-      setProfessionals(formattedData);
       setFilteredProfessionals(formattedData);
     } catch (error) {
       console.error('Error fetching professionals:', error);
@@ -113,8 +112,57 @@ export default function Home() {
     fetchProfessionals();
   }, []);
 
-  const placeholder = () => {};
+  const handleSearchInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(e.target.value);
+  };
 
+  const handleSearch = async () => {
+    if (!searchQuery.trim()) {
+      fetchProfessionals();
+      return;
+    }
+
+    try {
+      const response = await fetch('/api/nl-to-sql', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ query: searchQuery }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to get SQL query from AI');
+      }
+
+      const { sqlQuery } = await response.json();
+      console.log('Raw SQL Query:', sqlQuery);
+      
+      try {
+        
+        const { data, error } = await supabase.functions.invoke('run-sql', {
+          body: { sql: sqlQuery }
+        });
+
+        if (error) throw error;
+
+        const formattedData = data?.map((professional: Professional) => ({
+          ...professional,
+          skills: typeof professional.skills === 'string' ? JSON.parse(professional.skills) : professional.skills,
+          experience: typeof professional.experience === 'string' ? JSON.parse(professional.experience) : professional.experience,
+          education: typeof professional.education === 'string' ? JSON.parse(professional.education) : professional.education
+        })) || [];
+
+        setFilteredProfessionals(formattedData);
+        setCurrentPage(1);
+      } catch (parseError) {
+        console.error('Error parsing query:', parseError);
+        throw new Error('Invalid query format received from AI');
+      }
+    } catch (error) {
+      console.error('Error searching professionals:', error);
+    }
+  };
 
   const totalPages = Math.ceil(filteredProfessionals.length / ITEMS_PER_PAGE);
   const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
@@ -216,10 +264,10 @@ export default function Home() {
               type="text"
               placeholder="Search by name, country, skills or bio..."
               value={searchQuery}
-              onChange={placeholder}
+              onChange={handleSearchInputChange}
               className="w-full h-10 text-base"
             />
-            <Button onClick={placeholder} className="h-10">
+            <Button onClick={handleSearch} className="h-10">
               Search
             </Button>
             <Dialog open={isFilterOpen} onOpenChange={setIsFilterOpen}>
@@ -368,7 +416,7 @@ export default function Home() {
                   </div>
                 </div>
                 <div className="flex-none flex justify-end gap-2 pt-4 border-t">
-                  <Button onClick={placeholder}>
+                  <Button onClick={handleSearch}>
                     Apply Filters
                   </Button>
                 </div>
