@@ -19,13 +19,6 @@ import {
 } from "@/components/ui/command";
 import { Badge } from "@/components/ui/badge";
 import { X } from "lucide-react";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 
 interface Professional {
   id: number;
@@ -84,9 +77,6 @@ export default function Home() {
   const [countrySearch, setCountrySearch] = useState("");
   const [skillSearch, setSkillSearch] = useState("");
   const [experienceSearch, setExperienceSearch] = useState("");
-  const [countrySelectValue, setCountrySelectValue] = useState("");
-  const [skillSelectValue, setSkillSelectValue] = useState("");
-  const [experienceSelectValue, setExperienceSelectValue] = useState("");
   const [isCountryCommandOpen, setIsCountryCommandOpen] = useState(false);
   const [isSkillCommandOpen, setIsSkillCommandOpen] = useState(false);
   const [isExperienceCommandOpen, setIsExperienceCommandOpen] = useState(false);
@@ -101,7 +91,7 @@ export default function Home() {
       const { data, error } = await supabase
         .from('professionals')
         .select('*');
-        console.log(data);
+      console.log(data);
 
       if (error) throw error;
       
@@ -174,24 +164,6 @@ export default function Home() {
   const filteredExperience = EXPERIENCE_LEVELS.filter(level => 
     level?.toLowerCase().includes(experienceSearch.toLowerCase())
   );
-
-  const handleCountrySelect = (value: string) => {
-    if (value && !selectedCountries.includes(value)) {
-      setSelectedCountries([...selectedCountries, value]);
-    }
-  };
-
-  const handleSkillSelect = (value: string) => {
-    if (value && !selectedSkills.includes(value)) {
-      setSelectedSkills([...selectedSkills, value]);
-    }
-  };
-
-  const handleExperienceSelect = (value: string) => {
-    if (value && !selectedExperience.includes(value)) {
-      setSelectedExperience([...selectedExperience, value]);
-    }
-  };
 
   const applyFilters = () => {
     let filtered = professionals;
