@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { createClient } from '@supabase/supabase-js';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -13,7 +13,6 @@ import {
 } from "@/components/ui/dialog";
 import {
   Command,
-  CommandEmpty,
   CommandGroup,
   CommandInput,
   CommandItem,
@@ -97,9 +96,34 @@ export default function Home() {
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
   );
 
+  const fetchProfessionals = useCallback(async () => {
+    try {
+      const { data, error } = await supabase
+        .from('professionals')
+        .select('*');
+        console.log(data);
+
+      if (error) throw error;
+      
+      const formattedData = data?.map(professional => ({
+        ...professional,
+        skills: typeof professional.skills === 'string' ? JSON.parse(professional.skills) : professional.skills,
+        experience: typeof professional.experience === 'string' ? JSON.parse(professional.experience) : professional.experience,
+        education: typeof professional.education === 'string' ? JSON.parse(professional.education) : professional.education
+      })) || [];
+
+      setProfessionals(formattedData);
+      setFilteredProfessionals(formattedData);
+    } catch (error) {
+      console.error('Error fetching professionals:', error);
+    } finally {
+      setLoading(false);
+    }
+  }, [supabase]);
+
   useEffect(() => {
     fetchProfessionals();
-  }, []);
+  }, [fetchProfessionals]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -140,9 +164,6 @@ export default function Home() {
   const uniqueSkills = Array.from(new Set(professionals.flatMap(professional => 
     professional?.skills?.skills?.technical ? Object.keys(professional.skills.skills.technical) : []
   )));
-  const uniqueExperience = Array.from(new Set(professionals.flatMap(professional => 
-    professional?.experience ? professional.experience.map(exp => exp.company) : []
-  )));
 
   const filteredCountries = uniqueCountries.filter(country => 
     country?.toLowerCase().includes(countrySearch.toLowerCase())
@@ -155,21 +176,18 @@ export default function Home() {
   );
 
   const handleCountrySelect = (value: string) => {
-    setCountrySelectValue(value);
     if (value && !selectedCountries.includes(value)) {
       setSelectedCountries([...selectedCountries, value]);
     }
   };
 
   const handleSkillSelect = (value: string) => {
-    setSkillSelectValue(value);
     if (value && !selectedSkills.includes(value)) {
       setSelectedSkills([...selectedSkills, value]);
     }
   };
 
   const handleExperienceSelect = (value: string) => {
-    setExperienceSelectValue(value);
     if (value && !selectedExperience.includes(value)) {
       setSelectedExperience([...selectedExperience, value]);
     }
@@ -205,31 +223,6 @@ export default function Home() {
   const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
       performSearch();
-    }
-  };
-
-  const fetchProfessionals = async () => {
-    try {
-      const { data, error } = await supabase
-        .from('professionals')
-        .select('*');
-        console.log(data);
-
-      if (error) throw error;
-      
-      const formattedData = data?.map(professional => ({
-        ...professional,
-        skills: typeof professional.skills === 'string' ? JSON.parse(professional.skills) : professional.skills,
-        experience: typeof professional.experience === 'string' ? JSON.parse(professional.experience) : professional.experience,
-        education: typeof professional.education === 'string' ? JSON.parse(professional.education) : professional.education
-      })) || [];
-
-      setProfessionals(formattedData);
-      setFilteredProfessionals(formattedData);
-    } catch (error) {
-      console.error('Error fetching professionals:', error);
-    } finally {
-      setLoading(false);
     }
   };
 
