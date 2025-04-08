@@ -54,6 +54,7 @@ interface Professional {
   }>;
 
   bio: string;
+  recommendation?: string;
 }
 
 const ITEMS_PER_PAGE = 14;
@@ -143,7 +144,33 @@ export default function Home() {
           education: typeof professional.education === 'string' ? JSON.parse(professional.education) : professional.education
         })) || [];
 
-        setFilteredProfessionals(formattedData);
+        // Generate recommendations for each professional
+        const professionalsWithRecommendations = await Promise.all(
+          formattedData.map(async (professional: Professional) => {
+            const recommendationResponse = await fetch('/api/generate-recommendation', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                professional,
+                searchQuery
+              }),
+            });
+
+            if (!recommendationResponse.ok) {
+              throw new Error('Failed to generate recommendation');
+            }
+
+            const { recommendation } = await recommendationResponse.json();
+            return {
+              ...professional,
+              recommendation
+            };
+          })
+        );
+
+        setFilteredProfessionals(professionalsWithRecommendations);
         setCurrentPage(1);
       } catch (parseError) {
         console.error('Error parsing query:', parseError);
@@ -257,7 +284,10 @@ export default function Home() {
               onChange={handleSearchInputChange}
               className="w-full h-10 text-base"
             />
-            <Button onClick={handleSearch} className="h-10">
+            <Button 
+              onClick={handleSearch} 
+              className="h-10 active:scale-95 transition-transform duration-75"
+            >
               Search
             </Button>
             <Dialog open={isFilterOpen} onOpenChange={setIsFilterOpen}>
@@ -439,6 +469,12 @@ export default function Home() {
                             <h2 className="text-lg font-semibold mb-1">{professional.full_name}</h2>
                             <p className="text-sm text-gray-600 mb-2">{professional.country}</p>
                             <p className="text-sm text-gray-700 line-clamp-2 mb-2">{professional.bio}</p>
+                            {professional.recommendation && (
+                              <div className="bg-blue-50 p-2 rounded-md mb-2 min-h-[3rem]">
+                                <h3 className="text-sm font-medium text-blue-800 mb-1">Evaluation</h3>
+                                <p className="text-sm text-blue-700">{professional.recommendation}</p>
+                              </div>
+                            )}
                             <div className="flex flex-wrap gap-1">
                               {renderSkillBadges(professional.skills)}
                             </div>
@@ -596,6 +632,12 @@ export default function Home() {
                       <h2 className="text-lg font-semibold mb-1">{professional.full_name}</h2>
                       <p className="text-sm text-gray-600 mb-2">{professional.country}</p>
                       <p className="text-sm text-gray-700 line-clamp-2 mb-2">{professional.bio}</p>
+                      {professional.recommendation && (
+                        <div className="bg-blue-50 p-2 rounded-md mb-2 min-h-[3rem]">
+                          <h3 className="text-sm font-medium text-blue-800 mb-1">Evaluation</h3>
+                          <p className="text-sm text-blue-700">{professional.recommendation}</p>
+                        </div>
+                      )}
                       <div className="flex flex-wrap gap-1">
                         {renderSkillBadges(professional.skills)}
                       </div>
