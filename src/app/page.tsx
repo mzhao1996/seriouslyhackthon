@@ -13,12 +13,15 @@ import {
 } from "@/components/ui/dialog";
 import {
   Command,
-  CommandGroup,
   CommandInput,
-  CommandItem,
 } from "@/components/ui/command";
 import { Badge } from "@/components/ui/badge";
 import { X } from "lucide-react";
+
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+);
 
 interface Professional {
   id: number;
@@ -55,17 +58,6 @@ interface Professional {
 
 const ITEMS_PER_PAGE = 14;
 
-const EXPERIENCE_LEVELS = [
-  "Entry Level (0-2 years)",
-  "Mid Level (3-5 years)",
-  "Senior Level (6-10 years)",
-  "Expert Level (10+ years)"
-];
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
 
 export default function Home() {
   const [filteredProfessionals, setFilteredProfessionals] = useState<Professional[]>([]);
