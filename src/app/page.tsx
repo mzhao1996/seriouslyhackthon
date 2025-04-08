@@ -290,158 +290,6 @@ export default function Home() {
             >
               Search
             </Button>
-            <Dialog open={isFilterOpen} onOpenChange={setIsFilterOpen}>
-              <DialogTrigger asChild>
-                <Button variant="outline" className="h-10">
-                  Filters
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="sm:max-w-[600px] h-[600px] overflow-hidden flex flex-col">
-                <DialogHeader>
-                  <DialogTitle>Advanced Filters</DialogTitle>
-                </DialogHeader>
-                <div className="flex-1 overflow-y-auto space-y-6 py-4">
-                  <div className="space-y-2">
-                    <div className="flex justify-between items-center">
-                      <h4 className="font-medium">Countries</h4>
-                      <Button 
-                        variant="ghost" 
-                        size="sm"
-                        onClick={() => setSelectedCountries([])}
-                        className="h-8 px-2 text-xs"
-                      >
-                        Reset
-                      </Button>
-                    </div>
-                    <div className="flex flex-wrap gap-2 mb-2">
-                      {selectedCountries.map((country) => (
-                        <Badge key={country} variant="secondary">
-                          {country}
-                          <button
-                            onClick={() => setSelectedCountries(prev => prev.filter(c => c !== country))}
-                            className="ml-1 hover:text-red-500"
-                          >
-                            <X className="h-3 w-3" />
-                          </button>
-                        </Badge>
-                      ))}
-                    </div>
-                    <div className="command-container relative">
-                      <Command 
-                        className="rounded-lg border shadow-md"
-                        shouldFilter={false}
-                      >
-                        <CommandInput 
-                          placeholder="Search countries..." 
-                          value={countrySearch}
-                          onValueChange={setCountrySearch}
-                          onFocus={() => setIsCountryCommandOpen(true)}
-                        />
-                        {isCountryCommandOpen && (
-                          <div className="absolute top-full left-0 right-0 z-50 bg-white border rounded-md shadow-lg mt-1">
-                          </div>
-                        )}
-                      </Command>
-                    </div>
-                  </div>
-
-                  <div className="space-y-2">
-                    <div className="flex justify-between items-center">
-                      <h4 className="font-medium">Skills</h4>
-                      <Button 
-                        variant="ghost" 
-                        size="sm"
-                        onClick={() => setSelectedSkills([])}
-                        className="h-8 px-2 text-xs"
-                      >
-                        Reset
-                      </Button>
-                    </div>
-                    <div className="flex flex-wrap gap-2 mb-2">
-                      {selectedSkills.map((skill) => (
-                        <Badge key={skill} variant="secondary">
-                          {skill}
-                          <button
-                            onClick={() => setSelectedSkills(prev => prev.filter(s => s !== skill))}
-                            className="ml-1 hover:text-red-500"
-                          >
-                            <X className="h-3 w-3" />
-                          </button>
-                        </Badge>
-                      ))}
-                    </div>
-                    <div className="command-container relative">
-                      <Command 
-                        className="rounded-lg border shadow-md"
-                        shouldFilter={false}
-                      >
-                        <CommandInput 
-                          placeholder="Search skills..." 
-                          value={skillSearch}
-                          onValueChange={setSkillSearch}
-                          onFocus={() => setIsSkillCommandOpen(true)}
-                        />
-                        {isSkillCommandOpen && (
-                          <div className="absolute top-full left-0 right-0 z-50 bg-white border rounded-md shadow-lg mt-1">
-                            
-                          </div>
-                        )}
-                      </Command>
-                    </div>
-                  </div>
-
-                  <div className="space-y-2">
-                    <div className="flex justify-between items-center">
-                      <h4 className="font-medium">Experience</h4>
-                      <Button 
-                        variant="ghost" 
-                        size="sm"
-                        onClick={() => setSelectedExperience([])}
-                        className="h-8 px-2 text-xs"
-                      >
-                        Reset
-                      </Button>
-                    </div>
-                    <div className="flex flex-wrap gap-2 mb-2">
-                      {selectedExperience.map((exp) => (
-                        <Badge key={exp} variant="secondary">
-                          {exp}
-                          <button
-                            onClick={() => setSelectedExperience(prev => prev.filter(e => e !== exp))}
-                            className="ml-1 hover:text-red-500"
-                          >
-                            <X className="h-3 w-3" />
-                          </button>
-                        </Badge>
-                      ))}
-                    </div>
-                    <div className="command-container relative">
-                      <Command 
-                        className="rounded-lg border shadow-md"
-                        shouldFilter={false}
-                      >
-                        <CommandInput 
-                          placeholder="Search experience levels..." 
-                          value={experienceSearch}
-                          onValueChange={setExperienceSearch}
-                          onFocus={() => setIsExperienceCommandOpen(true)}
-                        />
-                        {isExperienceCommandOpen && (
-                          <div className="absolute top-full left-0 right-0 z-50 bg-white border rounded-md shadow-lg mt-1">
-                            
-                          </div>
-                        )}
-                      </Command>
-                    </div>
-                  </div>
-                </div>
-                <div className="flex-none flex justify-end gap-2 pt-4 border-t">
-                  <Button onClick={handleSearch}>
-                    Apply Filters
-                  </Button>
-                </div>
-              </DialogContent>
-            </Dialog>
           </div>
         </div>
         <div className="flex-1 overflow-hidden">
@@ -471,7 +319,7 @@ export default function Home() {
                             <p className="text-sm text-gray-700 line-clamp-2 mb-2">{professional.bio}</p>
                             {professional.recommendation && (
                               <div className="bg-blue-50 p-2 rounded-md mb-2 min-h-[3rem]">
-                                <h3 className="text-sm font-medium text-blue-800 mb-1">Evaluation</h3>
+                                <h3 className="text-sm font-medium text-blue-800 mb-1">AI Evaluation</h3>
                                 <p className="text-sm text-blue-700">{professional.recommendation}</p>
                               </div>
                             )}
@@ -539,6 +387,13 @@ export default function Home() {
                     <h3 className="text-xl font-semibold text-gray-900 mb-4">Professional Summary</h3>
                     <p className="text-gray-700 leading-relaxed">{selectedProfessional.bio}</p>
                   </div>
+
+                  {selectedProfessional.recommendation && (
+                    <div className="bg-blue-50 rounded-xl p-6">
+                      <h3 className="text-xl font-semibold text-blue-900 mb-4">AI Evaluation</h3>
+                      <p className="text-blue-700 leading-relaxed">{selectedProfessional.recommendation}</p>
+                    </div>
+                  )}
 
                   <div className="space-y-6">
                     <div className="space-y-4">
@@ -641,7 +496,7 @@ export default function Home() {
                             <p className="text-sm text-gray-700 line-clamp-3 mb-2">{professional.bio}</p>
                             {professional.recommendation && (
                               <div className="bg-blue-50 p-2 rounded-md mb-2 min-h-[3rem]">
-                                <h3 className="text-sm font-medium text-blue-800 mb-1">Evaluation</h3>
+                                <h3 className="text-sm font-medium text-blue-800 mb-1">AI Evaluation</h3>
                                 <p className="text-sm text-blue-700 line-clamp-2">{professional.recommendation}</p>
                               </div>
                             )}
@@ -676,7 +531,7 @@ export default function Home() {
                         <p className="text-sm text-gray-700 line-clamp-3 mb-2">{professional.bio}</p>
                         {professional.recommendation && (
                           <div className="bg-blue-50 p-2 rounded-md mb-2 min-h-[3rem]">
-                            <h3 className="text-sm font-medium text-blue-800 mb-1">Evaluation</h3>
+                            <h3 className="text-sm font-medium text-blue-800 mb-1">AI Evaluation</h3>
                             <p className="text-sm text-blue-700 line-clamp-2">{professional.recommendation}</p>
                           </div>
                         )}
