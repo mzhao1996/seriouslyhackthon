@@ -618,33 +618,76 @@ export default function Home() {
             </div>
           ) : (
             <div className="grid grid-cols-2 gap-4 h-full overflow-y-auto">
-              {currentProfessionals.map((professional) => (
-                <div 
-                  key={professional.id} 
-                  className="border rounded-lg p-3 shadow-sm hover:shadow-md transition-shadow cursor-pointer"
-                  onClick={() => setSelectedProfessional(professional)}
-                >
-                  <div className="flex h-full">
-                    <div className="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center text-lg font-bold text-gray-600 mr-3 flex-shrink-0">
-                      {professional.full_name.charAt(0)}
-                    </div>
-                    <div className="flex-1">
-                      <h2 className="text-lg font-semibold mb-1">{professional.full_name}</h2>
-                      <p className="text-sm text-gray-600 mb-2">{professional.country}</p>
-                      <p className="text-sm text-gray-700 line-clamp-2 mb-2">{professional.bio}</p>
-                      {professional.recommendation && (
-                        <div className="bg-blue-50 p-2 rounded-md mb-2 min-h-[3rem]">
-                          <h3 className="text-sm font-medium text-blue-800 mb-1">Evaluation</h3>
-                          <p className="text-sm text-blue-700">{professional.recommendation}</p>
+              {currentProfessionals.length <= 7 ? (
+                <>
+                  <div className="space-y-4">
+                    {currentProfessionals.map((professional) => (
+                      <div 
+                        key={professional.id} 
+                        className="border rounded-lg p-3 shadow-sm hover:shadow-md transition-shadow cursor-pointer h-[280px] flex flex-col"
+                        onClick={() => setSelectedProfessional(professional)}
+                      >
+                        <div className="flex flex-col h-full">
+                          <div className="flex items-center mb-3">
+                            <div className="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center text-lg font-bold text-gray-600 mr-3 flex-shrink-0">
+                              {professional.full_name.charAt(0)}
+                            </div>
+                            <div>
+                              <h2 className="text-lg font-semibold">{professional.full_name}</h2>
+                              <p className="text-sm text-gray-600">{professional.country}</p>
+                            </div>
+                          </div>
+                          <div className="flex-1 overflow-hidden">
+                            <p className="text-sm text-gray-700 line-clamp-3 mb-2">{professional.bio}</p>
+                            {professional.recommendation && (
+                              <div className="bg-blue-50 p-2 rounded-md mb-2 min-h-[3rem]">
+                                <h3 className="text-sm font-medium text-blue-800 mb-1">Evaluation</h3>
+                                <p className="text-sm text-blue-700 line-clamp-2">{professional.recommendation}</p>
+                              </div>
+                            )}
+                            <div className="flex flex-wrap gap-1">
+                              {renderSkillBadges(professional.skills)}
+                            </div>
+                          </div>
                         </div>
-                      )}
-                      <div className="flex flex-wrap gap-1">
-                        {renderSkillBadges(professional.skills)}
+                      </div>
+                    ))}
+                  </div>
+                  <div></div>
+                </>
+              ) : (
+                currentProfessionals.map((professional) => (
+                  <div 
+                    key={professional.id} 
+                    className="border rounded-lg p-3 shadow-sm hover:shadow-md transition-shadow cursor-pointer h-[280px] flex flex-col"
+                    onClick={() => setSelectedProfessional(professional)}
+                  >
+                    <div className="flex flex-col h-full">
+                      <div className="flex items-center mb-3">
+                        <div className="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center text-lg font-bold text-gray-600 mr-3 flex-shrink-0">
+                          {professional.full_name.charAt(0)}
+                        </div>
+                        <div>
+                          <h2 className="text-lg font-semibold">{professional.full_name}</h2>
+                          <p className="text-sm text-gray-600">{professional.country}</p>
+                        </div>
+                      </div>
+                      <div className="flex-1 overflow-hidden">
+                        <p className="text-sm text-gray-700 line-clamp-3 mb-2">{professional.bio}</p>
+                        {professional.recommendation && (
+                          <div className="bg-blue-50 p-2 rounded-md mb-2 min-h-[3rem]">
+                            <h3 className="text-sm font-medium text-blue-800 mb-1">Evaluation</h3>
+                            <p className="text-sm text-blue-700 line-clamp-2">{professional.recommendation}</p>
+                          </div>
+                        )}
+                        <div className="flex flex-wrap gap-1">
+                          {renderSkillBadges(professional.skills)}
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                ))
+              )}
             </div>
           )}
         </div>
