@@ -91,8 +91,6 @@ export default function Home() {
       const { data, error } = await supabase
         .from('professionals')
         .select('*');
-      console.log(data);
-
       if (error) throw error;
       
       const formattedData = data?.map(professional => ({
@@ -115,88 +113,8 @@ export default function Home() {
     fetchProfessionals();
   }, []);
 
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      const target = event.target as HTMLElement;
-      if (!target.closest('.command-container')) {
-        setIsCountryCommandOpen(false);
-        setIsSkillCommandOpen(false);
-        setIsExperienceCommandOpen(false);
-      }
-    };
+  const placeholder = () => {};
 
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
-
-  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchQuery(e.target.value);
-  };
-
-  const performSearch = () => {
-    if (searchQuery.trim() === "") {
-      setFilteredProfessionals(professionals);
-    } else {
-      const filtered = professionals.filter(professional => 
-        professional.full_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        professional.country.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        Object.keys(professional.skills.skills.technical).some(skill => 
-          skill.toLowerCase().includes(searchQuery.toLowerCase())
-        ) ||
-        professional.bio.toLowerCase().includes(searchQuery.toLowerCase())
-      );
-      setFilteredProfessionals(filtered);
-    }
-    setCurrentPage(1);
-  };
-
-  const uniqueCountries = Array.from(new Set(professionals.map(professional => professional.country)));
-  const uniqueSkills = Array.from(new Set(professionals.flatMap(professional => 
-    professional?.skills?.skills?.technical ? Object.keys(professional.skills.skills.technical) : []
-  )));
-
-  const filteredCountries = uniqueCountries.filter(country => 
-    country?.toLowerCase().includes(countrySearch.toLowerCase())
-  );
-  const filteredSkills = uniqueSkills.filter(skill => 
-    skill?.toLowerCase().includes(skillSearch.toLowerCase())
-  );
-  const filteredExperience = EXPERIENCE_LEVELS.filter(level => 
-    level?.toLowerCase().includes(experienceSearch.toLowerCase())
-  );
-
-  const applyFilters = () => {
-    let filtered = professionals;
-
-    if (selectedCountries.length > 0) {
-      filtered = filtered.filter(professional => 
-        professional?.country && selectedCountries.includes(professional.country)
-      );
-    }
-
-    if (selectedSkills.length > 0) {
-      filtered = filtered.filter(professional => 
-        professional?.skills?.skills?.technical && 
-        selectedSkills.some(skill => professional.skills.skills.technical.hasOwnProperty(skill))
-      );
-    }
-
-    if (selectedExperience.length > 0) {
-      filtered = filtered.filter(professional => 
-        professional?.experience && 
-        selectedExperience.some(exp => professional.experience.some(e => e.company === exp))
-      );
-    }
-
-    setFilteredProfessionals(filtered);
-    setCurrentPage(1);
-  };
-
-  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter') {
-      performSearch();
-    }
-  };
 
   const totalPages = Math.ceil(filteredProfessionals.length / ITEMS_PER_PAGE);
   const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
@@ -298,11 +216,10 @@ export default function Home() {
               type="text"
               placeholder="Search by name, country, skills or bio..."
               value={searchQuery}
-              onChange={handleSearch}
-              onKeyPress={handleKeyPress}
+              onChange={placeholder}
               className="w-full h-10 text-base"
             />
-            <Button onClick={performSearch} className="h-10">
+            <Button onClick={placeholder} className="h-10">
               Search
             </Button>
             <Dialog open={isFilterOpen} onOpenChange={setIsFilterOpen}>
@@ -354,30 +271,6 @@ export default function Home() {
                         />
                         {isCountryCommandOpen && (
                           <div className="absolute top-full left-0 right-0 z-50 bg-white border rounded-md shadow-lg mt-1">
-                            <CommandGroup className="max-h-[200px] overflow-auto">
-                              {filteredCountries.length > 0 ? (
-                                filteredCountries.map((country) => (
-                                  <CommandItem
-                                    key={country}
-                                    value={country}
-                                    onSelect={() => {
-                                      if (!selectedCountries.includes(country)) {
-                                        setSelectedCountries([...selectedCountries, country]);
-                                      }
-                                      setIsCountryCommandOpen(false);
-                                      setCountrySearch("");
-                                    }}
-                                    disabled={selectedCountries.includes(country)}
-                                  >
-                                    {country}
-                                  </CommandItem>
-                                ))
-                              ) : (
-                                <div className="py-2 text-center text-sm text-muted-foreground">
-                                  No matching countries found
-                                </div>
-                              )}
-                            </CommandGroup>
                           </div>
                         )}
                       </Command>
@@ -422,30 +315,7 @@ export default function Home() {
                         />
                         {isSkillCommandOpen && (
                           <div className="absolute top-full left-0 right-0 z-50 bg-white border rounded-md shadow-lg mt-1">
-                            <CommandGroup className="max-h-[200px] overflow-auto">
-                              {filteredSkills.length > 0 ? (
-                                filteredSkills.map((skill) => (
-                                  <CommandItem
-                                    key={skill}
-                                    value={skill}
-                                    onSelect={() => {
-                                      if (!selectedSkills.includes(skill)) {
-                                        setSelectedSkills([...selectedSkills, skill]);
-                                      }
-                                      setIsSkillCommandOpen(false);
-                                      setSkillSearch("");
-                                    }}
-                                    disabled={selectedSkills.includes(skill)}
-                                  >
-                                    {skill}
-                                  </CommandItem>
-                                ))
-                              ) : (
-                                <div className="py-2 text-center text-sm text-muted-foreground">
-                                  No matching skills found
-                                </div>
-                              )}
-                            </CommandGroup>
+                            
                           </div>
                         )}
                       </Command>
@@ -490,30 +360,7 @@ export default function Home() {
                         />
                         {isExperienceCommandOpen && (
                           <div className="absolute top-full left-0 right-0 z-50 bg-white border rounded-md shadow-lg mt-1">
-                            <CommandGroup className="max-h-[200px] overflow-auto">
-                              {filteredExperience.length > 0 ? (
-                                filteredExperience.map((level) => (
-                                  <CommandItem
-                                    key={level}
-                                    value={level}
-                                    onSelect={() => {
-                                      if (!selectedExperience.includes(level)) {
-                                        setSelectedExperience([...selectedExperience, level]);
-                                      }
-                                      setIsExperienceCommandOpen(false);
-                                      setExperienceSearch("");
-                                    }}
-                                    disabled={selectedExperience.includes(level)}
-                                  >
-                                    {level}
-                                  </CommandItem>
-                                ))
-                              ) : (
-                                <div className="py-2 text-center text-sm text-muted-foreground">
-                                  No matching experience levels found
-                                </div>
-                              )}
-                            </CommandGroup>
+                            
                           </div>
                         )}
                       </Command>
@@ -521,7 +368,7 @@ export default function Home() {
                   </div>
                 </div>
                 <div className="flex-none flex justify-end gap-2 pt-4 border-t">
-                  <Button onClick={applyFilters}>
+                  <Button onClick={placeholder}>
                     Apply Filters
                   </Button>
                 </div>
