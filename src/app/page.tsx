@@ -4,19 +4,6 @@ import { useEffect, useState, useCallback } from "react";
 import { createClient } from '@supabase/supabase-js';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import {
-  Command,
-  CommandInput,
-} from "@/components/ui/command";
-import { Badge } from "@/components/ui/badge";
-import { X } from "lucide-react";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
 
 const supabase = createClient(
@@ -364,11 +351,6 @@ export default function Home() {
       return;
     }
 
-    const filters = {
-      query: searchQuery,
-      country: countryFilter,
-      skill: skillFilter
-    };
     let sqlQuerybuilder = searchQuery;
     if (countryFilter && skillFilter) {
       sqlQuerybuilder = (searchQuery || "I want to find a Professional")+ " lived in " + countryFilter + " and has " + skillFilter + " skills";
