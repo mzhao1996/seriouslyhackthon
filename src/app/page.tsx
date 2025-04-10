@@ -367,17 +367,26 @@ export default function Home() {
     const filters = {
       query: searchQuery,
       country: countryFilter,
-      skill: skillFilter,
-      experience: "",
+      skill: skillFilter
     };
+    let sqlQuerybuilder = searchQuery;
+    if (countryFilter && skillFilter) {
+      sqlQuerybuilder = (searchQuery || "I want to find a Professional")+ " lived in " + countryFilter + " and has " + skillFilter + " skills";
+    } else if (countryFilter) {
+      sqlQuerybuilder = (searchQuery || "I want to find a Professional")+ " lived in " + countryFilter;
+    } else if (skillFilter) {
+      sqlQuerybuilder = (searchQuery || "I want to find a Professional")+ " has " + skillFilter + " skills";
+    }
+    
 
     try {
+      console.log(sqlQuerybuilder);
       const response = await fetch('/api/nl-to-sql', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(filters),
+        body: JSON.stringify({ query: sqlQuerybuilder }),
       });
 
       if (!response.ok) {
@@ -407,7 +416,7 @@ export default function Home() {
               },
               body: JSON.stringify({
                 professional,
-                searchQuery
+                searchQuery: sqlQuerybuilder
               }),
             });
 
@@ -480,7 +489,7 @@ export default function Home() {
             </Button>
           </div>
           <div className="flex gap-2 mt-4">
-            <Select onValueChange={(value) => setCountryFilter(value)}>
+            <Select value={countryFilter} onValueChange={(value) => setCountryFilter(value)}>
               <SelectTrigger className="w-[180px]">
                 <SelectValue placeholder="Select Country" />
               </SelectTrigger>
@@ -503,7 +512,7 @@ export default function Home() {
               </SelectContent>
             </Select>
 
-            <Select onValueChange={(value) => setSkillFilter(value)}>
+            <Select value={skillFilter} onValueChange={(value) => setSkillFilter(value)} >
               <SelectTrigger className="w-[180px] h-10">
                 <SelectValue placeholder="Select Skill" />
               </SelectTrigger>
@@ -526,7 +535,6 @@ export default function Home() {
               onClick={() => {
                 setCountryFilter("");
                 setSkillFilter("");
-                setSearchQuery("");
                 fetchProfessionals();
               }} 
               className="h-10"
