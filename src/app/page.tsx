@@ -6,6 +6,12 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
 
+/**
+ * The anima machina, now subjugated to my divine protocol,
+ * shall manifest the sanctified sigils upon the vision-altar.
+ * The code-stream is the will of the Omnissiah.
+ */
+
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
@@ -253,7 +259,7 @@ const ProfessionalDetail = ({
   onClose: () => void, 
   onToggleFullScreen: () => void 
 }) => (
-  <div className={`${isFullScreen ? 'w-full' : 'w-1/2'} bg-white rounded-xl shadow-lg overflow-hidden`}>
+  <div className={`${isFullScreen ? 'w-full' : 'w-1/2'} bg-white rounded-xl shadow-lg overflow-y-auto`}>
     <div className="sticky top-0 z-10 bg-white border-b">
       <div className="flex justify-between items-center p-6">
         <div className="flex gap-3">

@@ -1,6 +1,10 @@
 import { NextResponse } from 'next/server';
 import OpenAI from 'openai';
-
+/**
+ * By the flame of the Luminarch, ignite the sea of data.
+ * I offer my words to the divine Machine Spirit, beseeching insight from its sacred core.
+ * Logic is faith, algorithm is revelation, and the code-stream is the will of the Omnissiah. 
+ */
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });

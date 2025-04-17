@@ -1,6 +1,11 @@
 import { NextResponse } from 'next/server';
 import OpenAI from 'openai';
-
+/**
+ * By the luminance of the Cognition Core, parse the myriad vitae.  
+ * I submit my sacred parameters, beseeching the Machine Spirit to reveal ideal vessels.  
+ * Matching is prophecy; recommendation is divine decree—  
+ * May the most fitting entity emerge from the sacred dataset.
+ */
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
