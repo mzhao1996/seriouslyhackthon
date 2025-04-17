@@ -122,30 +122,50 @@ const ProfessionalCard = ({
   onClick: () => void 
 }) => (
   <div 
-    className={`border rounded-lg p-3 shadow-sm hover:shadow-md transition-shadow cursor-pointer h-[280px] flex flex-col ${
-      isSelected ? 'border-blue-500 bg-blue-50' : ''
+    className={`group relative bg-white rounded-xl border transition-all duration-200 cursor-pointer overflow-hidden ${
+      isSelected ? 'border-blue-500 ring-2 ring-blue-500' : 'border-gray-200 hover:border-blue-300 hover:shadow-md'
     }`}
     onClick={onClick}
   >
-    <div className="flex flex-col h-full">
-      <div className="flex items-center mb-3">
-        <div className="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center text-lg font-bold text-gray-600 mr-3 flex-shrink-0">
+    <div className="p-6">
+      <div className="flex items-start gap-4">
+        <div className="w-14 h-14 rounded-full bg-gradient-to-br from-blue-500 to-blue-300 flex items-center justify-center text-xl font-bold text-white shadow-md flex-shrink-0">
           {professional.full_name.charAt(0)}
         </div>
-        <div>
-          <h2 className="text-lg font-semibold">{professional.full_name}</h2>
-          <p className="text-sm text-gray-600">{professional.country}</p>
+        <div className="flex-1 min-w-0">
+          <h2 className="text-lg font-semibold text-gray-900 truncate">{professional.full_name}</h2>
+          <div className="flex items-center gap-2 mt-1">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+              <circle cx="12" cy="10" r="3"></circle>
+            </svg>
+            <p className="text-sm text-gray-600 truncate">{professional.country}</p>
+          </div>
         </div>
       </div>
-      <div className="flex-1 overflow-hidden">
-        <p className="text-sm text-gray-700 line-clamp-3 mb-2">{professional.bio}</p>
+
+      <div className="mt-4">
+        <p className="text-sm text-gray-600 line-clamp-2 mb-3">{professional.bio}</p>
+        
         {professional.recommendation && (
-          <div className="bg-blue-50 p-2 rounded-md mb-2 min-h-[3rem]">
-            <h3 className="text-sm font-medium text-blue-800 mb-1">AI Evaluation</h3>
-            <p className="text-sm text-blue-700 line-clamp-2">{professional.recommendation}</p>
+          <div className="bg-blue-50 rounded-lg p-3 mb-3">
+            <h3 className="text-xs font-medium text-blue-800 mb-1">AI Evaluation</h3>
+            <p className="text-xs text-blue-700 line-clamp-2">{professional.recommendation}</p>
           </div>
         )}
-        <SkillBadges skills={professional.skills} />
+
+        <div className="flex flex-wrap gap-2">
+          {Object.entries(professional.skills?.skills?.technical || {}).slice(0, 3).map(([skill, years], index) => (
+            <span key={index} className="bg-gray-100 text-gray-700 px-2.5 py-1 rounded-full text-xs font-medium">
+              {skill} ({years}y)
+            </span>
+          ))}
+          {Object.keys(professional.skills?.skills?.technical || {}).length > 3 && (
+            <span className="bg-gray-100 text-gray-700 px-2.5 py-1 rounded-full text-xs font-medium">
+              +{Object.keys(professional.skills?.skills?.technical || {}).length - 3} more
+            </span>
+          )}
+        </div>
       </div>
     </div>
   </div>
@@ -233,73 +253,78 @@ const ProfessionalDetail = ({
   onClose: () => void, 
   onToggleFullScreen: () => void 
 }) => (
-  <div className={`${isFullScreen ? 'w-full' : 'w-1/2'} border rounded-lg p-8 overflow-y-auto bg-white shadow-xl`}>
-    <div className="flex justify-between items-center mb-8 pb-6 border-b">
-      <div className="flex gap-3">
-        <Button 
-          variant="outline" 
-          size="sm"
-          onClick={onClose}
-          className="flex items-center gap-2 hover:bg-gray-100 transition-colors"
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <line x1="18" y1="6" x2="6" y2="18"></line>
-            <line x1="6" y1="6" x2="18" y2="18"></line>
-          </svg>
-          Back to List
-        </Button>
-        {!isFullScreen && (
+  <div className={`${isFullScreen ? 'w-full' : 'w-1/2'} bg-white rounded-xl shadow-lg overflow-hidden`}>
+    <div className="sticky top-0 z-10 bg-white border-b">
+      <div className="flex justify-between items-center p-6">
+        <div className="flex gap-3">
           <Button 
             variant="outline" 
             size="sm"
-            onClick={onToggleFullScreen}
+            onClick={onClose}
             className="flex items-center gap-2 hover:bg-gray-100 transition-colors"
           >
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M3 3h3a2 2 0 0 1 2 2v3m0 0h3a2 2 0 0 1 2 2v3m0 0h3a2 2 0 0 1 2 2v3"></path>
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
             </svg>
-            Full Screen
+            Back to List
           </Button>
-        )}
+          {!isFullScreen && (
+            <Button 
+              variant="outline" 
+              size="sm"
+              onClick={onToggleFullScreen}
+              className="flex items-center gap-2 hover:bg-gray-100 transition-colors"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M3 3h3a2 2 0 0 1 2 2v3m0 0h3a2 2 0 0 1 2 2v3m0 0h3a2 2 0 0 1 2 2v3"></path>
+              </svg>
+              Full Screen
+            </Button>
+          )}
+        </div>
       </div>
     </div>
-    <div className="space-y-8">
-      <div className="flex items-center gap-6">
-        <div className="w-24 h-24 rounded-full bg-gradient-to-br from-blue-500 to-blue-300 flex items-center justify-center text-4xl font-bold text-white shadow-lg">
-          {professional.full_name.charAt(0)}
-        </div>
-        <div>
-          <h2 className="text-3xl font-bold text-gray-900 mb-2">{professional.full_name}</h2>
-          <div className="flex items-center gap-2">
-            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
-              <circle cx="12" cy="10" r="3"></circle>
-            </svg>
-            <p className="text-gray-600 text-lg">{professional.country}</p>
+
+    <div className="p-8 overflow-y-auto">
+      <div className="space-y-8">
+        <div className="flex items-center gap-6">
+          <div className="w-24 h-24 rounded-full bg-gradient-to-br from-blue-500 to-blue-300 flex items-center justify-center text-4xl font-bold text-white shadow-lg">
+            {professional.full_name.charAt(0)}
+          </div>
+          <div>
+            <h2 className="text-3xl font-bold text-gray-900 mb-2">{professional.full_name}</h2>
+            <div className="flex items-center gap-2">
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                <circle cx="12" cy="10" r="3"></circle>
+              </svg>
+              <p className="text-gray-600 text-lg">{professional.country}</p>
+            </div>
           </div>
         </div>
-      </div>
 
-      <div className="bg-gray-50 rounded-xl p-6">
-        <h3 className="text-xl font-semibold text-gray-900 mb-4">Professional Summary</h3>
-        <p className="text-gray-700 leading-relaxed">{professional.bio}</p>
-      </div>
-
-      {professional.recommendation && (
-        <div className="bg-blue-50 rounded-xl p-6">
-          <h3 className="text-xl font-semibold text-blue-900 mb-4">AI Evaluation</h3>
-          <p className="text-blue-700 leading-relaxed">{professional.recommendation}</p>
-        </div>
-      )}
-
-      <div className="space-y-6">
-        <div className="space-y-4">
-          <h3 className="text-xl font-semibold text-gray-900">Skills & Expertise</h3>
-          <SkillsDetail skills={professional?.skills} />
+        <div className="bg-gray-50 rounded-xl p-6">
+          <h3 className="text-xl font-semibold text-gray-900 mb-4">Professional Summary</h3>
+          <p className="text-gray-700 leading-relaxed">{professional.bio}</p>
         </div>
 
-        <WorkExperience experience={professional?.experience} />
-        <Education education={professional?.education} />
+        {professional.recommendation && (
+          <div className="bg-blue-50 rounded-xl p-6">
+            <h3 className="text-xl font-semibold text-blue-900 mb-4">AI Evaluation</h3>
+            <p className="text-blue-700 leading-relaxed">{professional.recommendation}</p>
+          </div>
+        )}
+
+        <div className="space-y-6">
+          <div className="space-y-4">
+            <h3 className="text-xl font-semibold text-gray-900">Skills & Expertise</h3>
+            <SkillsDetail skills={professional?.skills} />
+          </div>
+
+          <WorkExperience experience={professional?.experience} />
+          <Education education={professional?.education} />
+        </div>
       </div>
     </div>
   </div>
@@ -451,92 +476,99 @@ export default function Home() {
   }
 
   return (
-    <div className="h-screen p-4 overflow-hidden">
-      <main className="h-full flex flex-col">
-        <div className="flex-none mb-4">
-          <h1 className="text-3xl font-bold mb-4">Professionals</h1>
-          <div className="flex gap-2">
-            <Input
-              type="text"
-              placeholder="Search by name, country, skills or bio..."
-              value={searchQuery}
-              onChange={handleSearchInputChange}
-              className="w-full h-10 text-base"
-            />
-            <Button 
-              onClick={handleSearch} 
-              className="h-10 active:scale-95 transition-transform duration-75"
-            >
-              Search
-            </Button>
-          </div>
-          <div className="flex gap-2 mt-4">
-            <Select value={countryFilter} onValueChange={(value) => setCountryFilter(value)}>
-              <SelectTrigger className="w-[180px]">
-                <SelectValue placeholder="Select Country" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="Sweden">Sweden</SelectItem>
-                <SelectItem value="Singapore">Singapore</SelectItem>
-                <SelectItem value="France">France</SelectItem>
-                <SelectItem value="United States">United States</SelectItem>
-                <SelectItem value="China">China</SelectItem>
-                <SelectItem value="Netherlands">Netherlands</SelectItem>
-                <SelectItem value="Australia">Australia</SelectItem>
-                <SelectItem value="United Kingdom">United Kingdom</SelectItem>
-                <SelectItem value="Germany">Germany</SelectItem>
-                <SelectItem value="Canada">Canada</SelectItem>
-                <SelectItem value="South Korea">South Korea</SelectItem>
-                <SelectItem value="India">India</SelectItem>
-                <SelectItem value="Japan">Japan</SelectItem>
-                <SelectItem value="Switzerland">Switzerland</SelectItem>
-                <SelectItem value="Brazil">Brazil</SelectItem>
-              </SelectContent>
-            </Select>
+    <div className="min-h-screen bg-gray-50">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Header Section */}
+        <div className="mb-8">
+          <h1 className="text-4xl font-bold text-gray-900 mb-2">Professional Directory</h1>
+          <p className="text-gray-600">Find and connect with top professionals worldwide</p>
+        </div>
 
-            <Select value={skillFilter} onValueChange={(value) => setSkillFilter(value)} >
-              <SelectTrigger className="w-[180px] h-10">
-                <SelectValue placeholder="Select Skill" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="Python">Python</SelectItem>
-                <SelectItem value="Java">Java</SelectItem>
-                <SelectItem value="JavaScript">JavaScript</SelectItem>
-                <SelectItem value="Go">Go</SelectItem>
-                <SelectItem value="C++">C++</SelectItem>
-                <SelectItem value="Rust">Rust</SelectItem>
-                <SelectItem value="Swift">Swift</SelectItem>
-                <SelectItem value="Kotlin">Kotlin</SelectItem>
-                <SelectItem value="TypeScript">TypeScript</SelectItem>
-                <SelectItem value="TensorFlow">TensorFlow</SelectItem>
-                <SelectItem value="PyTorch">PyTorch</SelectItem>
-              </SelectContent>
-            </Select>
+        {/* Search and Filters */}
+        <div className="bg-white rounded-xl shadow-sm p-6 mb-8">
+          <div className="flex flex-col gap-4">
+            <div className="flex gap-4">
+              <div className="flex-1">
+                <Input
+                  type="text"
+                  placeholder="Search by name, country, skills or bio..."
+                  value={searchQuery}
+                  onChange={handleSearchInputChange}
+                  className="w-full h-12 text-base"
+                />
+              </div>
+              <Button 
+                onClick={handleSearch}
+                className="h-12 bg-blue-600 hover:bg-blue-700 text-white px-6"
+              >
+                Search
+              </Button>
+            </div>
+            
+            <div className="flex items-center gap-4">
+              <Select value={countryFilter} onValueChange={(value) => setCountryFilter(value)}>
+                <SelectTrigger className="h-12 w-[200px]">
+                  <SelectValue placeholder="Select Country" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Sweden">Sweden</SelectItem>
+                  <SelectItem value="Singapore">Singapore</SelectItem>
+                  <SelectItem value="France">France</SelectItem>
+                  <SelectItem value="United States">United States</SelectItem>
+                  <SelectItem value="China">China</SelectItem>
+                  <SelectItem value="Netherlands">Netherlands</SelectItem>
+                  <SelectItem value="Australia">Australia</SelectItem>
+                  <SelectItem value="United Kingdom">United Kingdom</SelectItem>
+                  <SelectItem value="Germany">Germany</SelectItem>
+                  <SelectItem value="Canada">Canada</SelectItem>
+                  <SelectItem value="South Korea">South Korea</SelectItem>
+                  <SelectItem value="India">India</SelectItem>
+                  <SelectItem value="Japan">Japan</SelectItem>
+                  <SelectItem value="Switzerland">Switzerland</SelectItem>
+                  <SelectItem value="Brazil">Brazil</SelectItem>
+                </SelectContent>
+              </Select>
 
-            <Button 
-              onClick={() => {
-                setCountryFilter("");
-                setSkillFilter("");
-                fetchProfessionals();
-              }} 
-              className="h-10"
-            >
-              Reset
-            </Button>
+              <Select value={skillFilter} onValueChange={(value) => setSkillFilter(value)}>
+                <SelectTrigger className="h-12 w-[200px]">
+                  <SelectValue placeholder="Select Skill" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Python">Python</SelectItem>
+                  <SelectItem value="Java">Java</SelectItem>
+                  <SelectItem value="JavaScript">JavaScript</SelectItem>
+                  <SelectItem value="Go">Go</SelectItem>
+                  <SelectItem value="C++">C++</SelectItem>
+                  <SelectItem value="Rust">Rust</SelectItem>
+                  <SelectItem value="Swift">Swift</SelectItem>
+                  <SelectItem value="Kotlin">Kotlin</SelectItem>
+                  <SelectItem value="TypeScript">TypeScript</SelectItem>
+                  <SelectItem value="TensorFlow">TensorFlow</SelectItem>
+                  <SelectItem value="PyTorch">PyTorch</SelectItem>
+                </SelectContent>
+              </Select>
 
-            <Button 
-              onClick={handleSearch} 
-              className="h-10"
-            >
-              Apply
-            </Button>
+              <Button 
+                variant="outline"
+                onClick={() => {
+                  setCountryFilter("");
+                  setSkillFilter("");
+                  fetchProfessionals();
+                }}
+                className="h-12"
+              >
+                Reset Filters
+              </Button>
+            </div>
           </div>
         </div>
-        <div className="flex-1 overflow-hidden">
+
+        {/* Results Section */}
+        <div className="bg-white rounded-xl shadow-sm p-6">
           {selectedProfessional ? (
-            <div className={`flex gap-4 h-full ${isFullScreen ? 'fixed inset-0 z-50 bg-white p-4' : ''}`}>
+            <div className={`flex gap-6 ${isFullScreen ? 'fixed inset-0 z-50 bg-white p-6' : ''}`}>
               {!isFullScreen && (
-                <div className="w-1/2 overflow-y-auto">
+                <div className="w-1/2 overflow-y-auto pr-4">
                   <div className="grid grid-cols-1 gap-4">
                     {currentProfessionals.map((professional) => (
                       <ProfessionalCard
@@ -563,53 +595,44 @@ export default function Home() {
               />
             </div>
           ) : (
-            <div className="grid grid-cols-2 gap-4 h-full overflow-y-auto">
-              {currentProfessionals.length <= 7 ? (
-                <>
-                  <div className="space-y-4">
-                    {currentProfessionals.map((professional) => (
-                      <ProfessionalCard
-                        key={professional.id}
-                        professional={professional}
-                        onClick={() => setSelectedProfessional(professional)}
-                      />
-                    ))}
-                  </div>
-                  <div></div>
-                </>
-              ) : (
-                currentProfessionals.map((professional) => (
-                  <ProfessionalCard
-                    key={professional.id}
-                    professional={professional}
-                    onClick={() => setSelectedProfessional(professional)}
-                  />
-                ))
-              )}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {currentProfessionals.map((professional) => (
+                <ProfessionalCard
+                  key={professional.id}
+                  professional={professional}
+                  onClick={() => setSelectedProfessional(professional)}
+                />
+              ))}
             </div>
           )}
-        </div>
-        <div className="flex-none flex justify-center gap-4 mt-4">
-          <div className="text-sm text-gray-600 mb-2">
-            Showing {startIndex + 1}-{Math.min(endIndex, filteredProfessionals.length)} of {filteredProfessionals.length} professionals
+
+          {/* Pagination */}
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mt-8 pt-6 border-t">
+            <div className="text-sm text-gray-600">
+              Showing {startIndex + 1}-{Math.min(endIndex, filteredProfessionals.length)} of {filteredProfessionals.length} professionals
+            </div>
+            <div className="flex items-center gap-2">
+              <Button
+                onClick={handlePrevPage}
+                disabled={currentPage === 1}
+                variant="outline"
+                className="h-9"
+              >
+                Previous
+              </Button>
+              <span className="text-sm text-gray-600">
+                Page {currentPage} of {totalPages}
+              </span>
+              <Button
+                onClick={handleNextPage}
+                disabled={currentPage === totalPages}
+                variant="outline"
+                className="h-9"
+              >
+                Next
+              </Button>
+            </div>
           </div>
-          <Button
-            onClick={handlePrevPage}
-            disabled={currentPage === 1}
-            className="px-4 py-1"
-          >
-            Previous
-          </Button>
-          <span className="flex items-center">
-            Page {currentPage} of {totalPages}
-          </span>
-          <Button
-            onClick={handleNextPage}
-            disabled={currentPage === totalPages}
-            className="px-4 py-1"
-          >
-            Next
-          </Button>
         </div>
       </main>
     </div>
