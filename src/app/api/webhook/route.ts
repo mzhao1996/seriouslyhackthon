@@ -1,6 +1,9 @@
 // /app/api/webhook/route.ts
+// /app/api/webhook/route.ts
 import { NextResponse } from "next/server";
-import nodemailer from "nodemailer";
+import { Resend } from "resend";
+
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 export async function POST(req: Request) {
   try {
@@ -63,26 +66,19 @@ ${transcript}
     const summary = summaryData.choices[0].message.content;
     const script = scriptData.choices[0].message.content;
 
-    const transporter = nodemailer.createTransport({
-      service: "Gmail",
-      auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS,
-      },
-    });
-
-    await transporter.sendMail({
-      from: `"AI Assistant" <${process.env.EMAIL_USER}>`,
+    const emailRes = await resend.emails.send({
+      from: "AI Assistant <ai@yourdomain.com>", // replace this domain, used resend api key
       to: email,
       subject: "Your AI Call Summary & Script",
       text: `Call Summary:\n\n${summary}\n\nFull Script:\n\n${script}`,
     });
 
-    return NextResponse.json({ success: true });
+    return NextResponse.json({ success: true, emailRes });
   } catch (error) {
     console.error("Webhook processing failed:", error);
     return NextResponse.json({ error: "Webhook failure" }, { status: 500 });
   }
 }
+
 // need update this api to the simple ai website/console/terminal
 //https://domain.com/api/webhook
