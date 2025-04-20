@@ -5,6 +5,7 @@ import { createClient } from '@supabase/supabase-js';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 /**
  * The anima machina, now subjugated to my divine protocol,
@@ -252,89 +253,212 @@ const ProfessionalDetail = ({
   professional, 
   isFullScreen, 
   onClose, 
-  onToggleFullScreen 
+  onToggleFullScreen,
+  onBookCall,
+  callDetails
 }: { 
   professional: Professional, 
   isFullScreen: boolean, 
   onClose: () => void, 
-  onToggleFullScreen: () => void 
-}) => (
-  <div className={`${isFullScreen ? 'w-full' : 'w-1/2'} bg-white rounded-xl shadow-lg overflow-y-auto`}>
-    <div className="sticky top-0 z-10 bg-white border-b">
-      <div className="flex justify-between items-center p-6">
-        <div className="flex gap-3">
-          <Button 
-            variant="outline" 
-            size="sm"
-            onClick={onClose}
-            className="flex items-center gap-2 hover:bg-gray-100 transition-colors"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <line x1="18" y1="6" x2="6" y2="18"></line>
-              <line x1="6" y1="6" x2="18" y2="18"></line>
-            </svg>
-            Back to List
-          </Button>
-          {!isFullScreen && (
+  onToggleFullScreen: () => void,
+  onBookCall: (id: number, details: { summary: string; questions: string; email: string }) => void,
+  callDetails: Record<number, {
+    isBooked: boolean;
+    details: {
+      summary: string;
+      questions: string;
+      email: string;
+    };
+  }>
+}) => {
+  const [showCallDialog, setShowCallDialog] = useState(false);
+  const [showConfirmationDialog, setShowConfirmationDialog] = useState(false);
+  const [tempCallDetails, setTempCallDetails] = useState({
+    summary: '',
+    questions: '',
+    email: ''
+  });
+
+  const isCallBooked = callDetails[professional.id]?.isBooked || false;
+  const details = callDetails[professional.id]?.details || { summary: '', questions: '', email: '' };
+
+  const handleSubmitCall = () => {
+    onBookCall(professional.id, tempCallDetails);
+    setShowConfirmationDialog(true);
+    setShowCallDialog(false);
+  };
+
+  return (
+    <div className={`${isFullScreen ? 'w-full' : 'w-1/2'} bg-white rounded-xl shadow-lg overflow-y-auto`}>
+      <div className="sticky top-0 z-10 bg-white border-b">
+        <div className="flex justify-between items-center p-6">
+          <div className="flex gap-3">
             <Button 
               variant="outline" 
               size="sm"
-              onClick={onToggleFullScreen}
+              onClick={onClose}
               className="flex items-center gap-2 hover:bg-gray-100 transition-colors"
             >
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M3 3h3a2 2 0 0 1 2 2v3m0 0h3a2 2 0 0 1 2 2v3m0 0h3a2 2 0 0 1 2 2v3"></path>
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
               </svg>
-              Full Screen
+              Back to List
             </Button>
-          )}
+            {!isFullScreen && (
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={onToggleFullScreen}
+                className="flex items-center gap-2 hover:bg-gray-100 transition-colors"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M3 3h3a2 2 0 0 1 2 2v3m0 0h3a2 2 0 0 1 2 2v3m0 0h3a2 2 0 0 1 2 2v3"></path>
+                </svg>
+                Full Screen
+              </Button>
+            )}
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setShowCallDialog(true)}
+              className="flex items-center gap-2 hover:bg-gray-100 transition-colors"
+            >
+              {isCallBooked ? "Called by AI" : "Call by AI"}
+            </Button>
+          </div>
         </div>
       </div>
-    </div>
 
-    <div className="p-8 overflow-y-auto">
-      <div className="space-y-8">
-        <div className="flex items-center gap-6">
-          <div className="w-24 h-24 rounded-full bg-gradient-to-br from-blue-500 to-blue-300 flex items-center justify-center text-4xl font-bold text-white shadow-lg">
-            {professional.full_name.charAt(0)}
-          </div>
-          <div>
-            <h2 className="text-3xl font-bold text-gray-900 mb-2">{professional.full_name}</h2>
-            <div className="flex items-center gap-2">
-              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
-                <circle cx="12" cy="10" r="3"></circle>
-              </svg>
-              <p className="text-gray-600 text-lg">{professional.country}</p>
+      <Dialog open={showCallDialog && !isCallBooked} onOpenChange={setShowCallDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Book a Call with AI</DialogTitle>
+            <DialogDescription>
+              Please provide the following information to book your call.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Self Introduction</label>
+              <Input
+                placeholder="tell the talent about yourself"
+                value={tempCallDetails.summary}
+                onChange={(e) => setTempCallDetails({...tempCallDetails, summary: e.target.value})}
+              />
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Questions</label>
+              <Input
+                placeholder="Questions you want to ask"
+                value={tempCallDetails.questions}
+                onChange={(e) => setTempCallDetails({...tempCallDetails, questions: e.target.value})}
+              />
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Email</label>
+              <Input
+                type="email"
+                placeholder="Your email address"
+                value={tempCallDetails.email}
+                onChange={(e) => setTempCallDetails({...tempCallDetails, email: e.target.value})}
+              />
             </div>
           </div>
-        </div>
+          <DialogFooter>
+            <Button onClick={handleSubmitCall}>Book a Call</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
-        <div className="bg-gray-50 rounded-xl p-6">
-          <h3 className="text-xl font-semibold text-gray-900 mb-4">Professional Summary</h3>
-          <p className="text-gray-700 leading-relaxed">{professional.bio}</p>
-        </div>
+      <Dialog open={showConfirmationDialog} onOpenChange={setShowConfirmationDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Call Booked Successfully</DialogTitle>
+            <DialogDescription>
+              Your call is booked, you will receive a transcript report in 3 days.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button onClick={() => {
+              setShowConfirmationDialog(false);
+            }}>OK</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
-        {professional.recommendation && (
-          <div className="bg-blue-50 rounded-xl p-6">
-            <h3 className="text-xl font-semibold text-blue-900 mb-4">AI Evaluation</h3>
-            <p className="text-blue-700 leading-relaxed">{professional.recommendation}</p>
-          </div>
-        )}
-
-        <div className="space-y-6">
+      <Dialog open={showCallDialog && isCallBooked} onOpenChange={setShowCallDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Call Details</DialogTitle>
+            <DialogDescription>
+              Here are the details of your booked call.
+            </DialogDescription>
+          </DialogHeader>
           <div className="space-y-4">
-            <h3 className="text-xl font-semibold text-gray-900">Skills & Expertise</h3>
-            <SkillsDetail skills={professional?.skills} />
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Self Introduction</label>
+              <div className="p-2 bg-gray-50 rounded-md">{details.summary}</div>
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Questions</label>
+              <div className="p-2 bg-gray-50 rounded-md">{details.questions}</div>
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Email</label>
+              <div className="p-2 bg-gray-50 rounded-md">{details.email}</div>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button onClick={() => setShowCallDialog(false)}>Close</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <div className="p-8 overflow-y-auto">
+        <div className="space-y-8">
+          <div className="flex items-center gap-6">
+            <div className="w-24 h-24 rounded-full bg-gradient-to-br from-blue-500 to-blue-300 flex items-center justify-center text-4xl font-bold text-white shadow-lg">
+              {professional.full_name.charAt(0)}
+            </div>
+            <div>
+              <h2 className="text-3xl font-bold text-gray-900 mb-2">{professional.full_name}</h2>
+              <div className="flex items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                  <circle cx="12" cy="10" r="3"></circle>
+                </svg>
+                <p className="text-gray-600 text-lg">{professional.country}</p>
+              </div>
+            </div>
           </div>
 
-          <WorkExperience experience={professional?.experience} />
-          <Education education={professional?.education} />
+          <div className="bg-gray-50 rounded-xl p-6">
+            <h3 className="text-xl font-semibold text-gray-900 mb-4">Professional Summary</h3>
+            <p className="text-gray-700 leading-relaxed">{professional.bio}</p>
+          </div>
+
+          {professional.recommendation && (
+            <div className="bg-blue-50 rounded-xl p-6">
+              <h3 className="text-xl font-semibold text-blue-900 mb-4">AI Evaluation</h3>
+              <p className="text-blue-700 leading-relaxed">{professional.recommendation}</p>
+            </div>
+          )}
+
+          <div className="space-y-6">
+            <div className="space-y-4">
+              <h3 className="text-xl font-semibold text-gray-900">Skills & Expertise</h3>
+              <SkillsDetail skills={professional?.skills} />
+            </div>
+
+            <WorkExperience experience={professional?.experience} />
+            <Education education={professional?.education} />
+          </div>
         </div>
       </div>
     </div>
-  </div>
-);
+  );
+};
 
 export default function Home() {
   const [filteredProfessionals, setFilteredProfessionals] = useState<Professional[]>([]);
@@ -345,6 +469,24 @@ export default function Home() {
   const [isFullScreen, setIsFullScreen] = useState(false);
   const [countryFilter, setCountryFilter] = useState<string>("");
   const [skillFilter, setSkillFilter] = useState<string>("");
+  const [professionalCallDetails, setProfessionalCallDetails] = useState<Record<number, {
+    isBooked: boolean;
+    details: {
+      summary: string;
+      questions: string;
+      email: string;
+    };
+  }>>({});
+
+  const handleBookCall = (professionalId: number, details: { summary: string; questions: string; email: string }) => {
+    setProfessionalCallDetails(prev => ({
+      ...prev,
+      [professionalId]: {
+        isBooked: true,
+        details
+      }
+    }));
+  };
 
   const fetchProfessionals = useCallback(async () => {
     try {
@@ -598,6 +740,8 @@ export default function Home() {
                   setIsFullScreen(false);
                 }}
                 onToggleFullScreen={() => setIsFullScreen(true)}
+                onBookCall={handleBookCall}
+                callDetails={professionalCallDetails}
               />
             </div>
           ) : (
