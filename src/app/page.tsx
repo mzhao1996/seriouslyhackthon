@@ -288,6 +288,18 @@ const ProfessionalDetail = ({
     setShowCallDialog(false);
   };
 
+  const callTheTalent = async (professional: Professional, details: { summary: string; questions: string; email: string }) => {
+    // pass the call details, talent connection details to router
+    const response = await fetch('/api/call-by-ai', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ professional, details,type: 'fake' }),
+    });
+
+  }
+
   return (
     <div className={`${isFullScreen ? 'w-full' : 'w-1/2'} bg-white rounded-xl shadow-lg overflow-y-auto`}>
       <div className="sticky top-0 z-10 bg-white border-b">
@@ -382,6 +394,7 @@ const ProfessionalDetail = ({
           <DialogFooter>
             <Button onClick={() => {
               setShowConfirmationDialog(false);
+              callTheTalent(professional, details);
             }}>OK</Button>
           </DialogFooter>
         </DialogContent>
