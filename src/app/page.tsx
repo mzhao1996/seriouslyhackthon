@@ -54,20 +54,6 @@ interface Professional {
 
 const ITEMS_PER_PAGE = 14;
 
-const SkillBadges = ({ skills }: { skills: Professional['skills'] }) => {
-  if (!skills?.skills?.technical) return null;
-  
-  return (
-    <div className="flex flex-wrap gap-1">
-      {Object.entries(skills.skills.technical).map(([skill, years], index) => (
-        <span key={index} className="bg-gray-100 px-2 py-0.5 rounded-full text-xs">
-          {skill} ({years} years)
-        </span>
-      ))}
-    </div>
-  );
-};
-
 const SkillsDetail = ({ skills }: { skills: Professional['skills'] }) => {
   if (!skills) return null;
 
@@ -298,6 +284,12 @@ const ProfessionalDetail = ({
       body: JSON.stringify({ professional, details,type: 'fake' }),
     });
 
+    if (!response.ok) {
+      throw new Error('Failed to call the talent');
+    }
+
+    const data = await response.json();
+    console.log(data);
   }
 
   return (
