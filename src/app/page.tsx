@@ -474,6 +474,8 @@ export default function Home() {
   const [isFullScreen, setIsFullScreen] = useState(false);
   const [countryFilter, setCountryFilter] = useState<string>("");
   const [skillFilter, setSkillFilter] = useState<string>("");
+  const [countryOptions, setCountryOptions] = useState<string[]>([]);
+  const [skillOptions, setSkillOptions] = useState<string[]>([]);
   const [professionalCallDetails, setProfessionalCallDetails] = useState<Record<number, {
     isBooked: boolean;
     details: {
@@ -507,6 +509,24 @@ export default function Home() {
         experience: typeof professional.experience === 'string' ? JSON.parse(professional.experience) : professional.experience,
         education: typeof professional.education === 'string' ? JSON.parse(professional.education) : professional.education
       })) || [];
+
+      // 提取所有唯一的国家和技能
+      const countries = new Set<string>();
+      const skills = new Set<string>();
+      
+      formattedData.forEach(professional => {
+        if (professional.country) {
+          countries.add(professional.country);
+        }
+        if (professional.skills?.skills?.technical) {
+          Object.keys(professional.skills.skills.technical).forEach(skill => {
+            skills.add(skill);
+          });
+        }
+      });
+
+      setCountryOptions(Array.from(countries).sort());
+      setSkillOptions(Array.from(skills).sort());
       setFilteredProfessionals(formattedData);
     } catch (error) {
       console.error('Error getting professional data:', error);
@@ -660,44 +680,28 @@ export default function Home() {
             
             <div className="flex items-center gap-4">
               <Select value={countryFilter} onValueChange={(value) => setCountryFilter(value)}>
-                <SelectTrigger className="h-12 w-[200px]">
+                <SelectTrigger className="h-12 w-[200px]" data-testid="country-filter">
                   <SelectValue placeholder="Select Country" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="Sweden">Sweden</SelectItem>
-                  <SelectItem value="Singapore">Singapore</SelectItem>
-                  <SelectItem value="France">France</SelectItem>
-                  <SelectItem value="United States">United States</SelectItem>
-                  <SelectItem value="China">China</SelectItem>
-                  <SelectItem value="Netherlands">Netherlands</SelectItem>
-                  <SelectItem value="Australia">Australia</SelectItem>
-                  <SelectItem value="United Kingdom">United Kingdom</SelectItem>
-                  <SelectItem value="Germany">Germany</SelectItem>
-                  <SelectItem value="Canada">Canada</SelectItem>
-                  <SelectItem value="South Korea">South Korea</SelectItem>
-                  <SelectItem value="India">India</SelectItem>
-                  <SelectItem value="Japan">Japan</SelectItem>
-                  <SelectItem value="Switzerland">Switzerland</SelectItem>
-                  <SelectItem value="Brazil">Brazil</SelectItem>
+                  {countryOptions.map((country) => (
+                    <SelectItem key={country} value={country} data-testid="country-option">
+                      {country}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
 
               <Select value={skillFilter} onValueChange={(value) => setSkillFilter(value)}>
-                <SelectTrigger className="h-12 w-[200px]">
+                <SelectTrigger className="h-12 w-[200px]" data-testid="skills-filter">
                   <SelectValue placeholder="Select Skill" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="Python">Python</SelectItem>
-                  <SelectItem value="Java">Java</SelectItem>
-                  <SelectItem value="JavaScript">JavaScript</SelectItem>
-                  <SelectItem value="Go">Go</SelectItem>
-                  <SelectItem value="C++">C++</SelectItem>
-                  <SelectItem value="Rust">Rust</SelectItem>
-                  <SelectItem value="Swift">Swift</SelectItem>
-                  <SelectItem value="Kotlin">Kotlin</SelectItem>
-                  <SelectItem value="TypeScript">TypeScript</SelectItem>
-                  <SelectItem value="TensorFlow">TensorFlow</SelectItem>
-                  <SelectItem value="PyTorch">PyTorch</SelectItem>
+                  {skillOptions.map((skill) => (
+                    <SelectItem key={skill} value={skill} data-testid="skill-option" >
+                      {skill}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
 
